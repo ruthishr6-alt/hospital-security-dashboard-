@@ -1,0 +1,641 @@
+{% extends "base.html" %}
+
+{% block title %}Patient EMR Chart: {{ patient.name }} ({{ patient.patient_id }}) | Critical Heart Patient Security{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 32px;">
+
+    <!-- MANDATORY ACADEMIC PROTOTYPE NOTICE -->
+    <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <span style="color: #1e40af; font-size: 0.84rem; font-weight: 700;">
+            ⚠️ DEMO DATA – NOT REAL PATIENT INFORMATION • Academic Cybersecurity Healthcare Prototype
+        </span>
+        <span class="badge badge-low" style="font-size: 0.72rem;">
+            ACCESS STATUS: {{ access_status }}
+        </span>
+    </div>
+
+    <!-- 1. DECOY ENVIRONMENT / HONEYPOT BANNER (If Decoy Session) -->
+    {% if is_decoy %}
+    <div class="security-alert-box" style="margin-bottom: 24px;">
+        <div class="security-alert-icon">⚠️</div>
+        <div class="security-alert-content" style="flex: 1;">
+            <h4>SUSPICIOUS ACTIVITY DETECTED • DECOY HONEYPOT ACTIVATED</h4>
+            <p>
+                Real protected heart patient database is <strong>STRICTLY PROTECTED &amp; BLOCKED</strong>.
+                This session has been transparently routed to an isolated cybersecurity honeytoken sandbox containing exclusively synthetic decoy records.
+            </p>
+            <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                <span class="badge badge-critical">Threat: Unauthorized Access</span>
+                <span class="badge badge-critical">Risk Score: {{ risk.score }}/100 (CRITICAL)</span>
+                <span class="badge badge-critical">Action: REAL DATA BLOCKED</span>
+                <span class="badge badge-decoy">Response: DECOY ENVIRONMENT ACTIVATED</span>
+                <span class="badge badge-critical">Mode: SECURITY MONITORING MODE</span>
+            </div>
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #dc2626; text-align: right;">
+            SECURITY INCIDENT TRAP<br>
+            TELEMETRY LOGGED
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- 2. EMERGENCY BREAK-GLASS ACTIVE BANNER (If Emergency Override) -->
+    {% if is_emergency %}
+    <div class="security-alert-box" style="background: #fff1f2; border-color: #fecdd3; border-left-color: #e11d48; margin-bottom: 24px;">
+        <div class="security-alert-icon">🚨</div>
+        <div class="security-alert-content" style="flex: 1;">
+            <h4 style="color: #9f1239;">EMERGENCY BREAK-GLASS PROTOCOL ACTIVE</h4>
+            <p style="color: #be123c;">
+                Temporary 15-minute emergency authorization granted for unassigned patient. An audit record has been dispatched to the Security Operations Center.
+            </p>
+        </div>
+        <span class="badge badge-critical" style="font-size: 0.8rem; padding: 6px 12px;">TEMPORARY OVERRIDE</span>
+    </div>
+    {% endif %}
+
+    <!-- ====================================================================
+         SECTION 1: PATIENT INFORMATION (PROFESSIONAL HOSPITAL EHR BANNER)
+         ==================================================================== -->
+    <div class="ehr-patient-card">
+        <div class="ehr-patient-header">
+            <div class="ehr-patient-title">
+                <i class="fa-solid fa-hospital-user" style="color: var(--turquoise-primary);"></i>
+                <span>PATIENT INFORMATION &bull; CLINICAL HEALTH RECORD</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                {% if is_decoy %}
+                    <span class="badge badge-decoy" style="font-weight: 700;">🎭 SYNTHETIC DECOY RECORD</span>
+                {% else %}
+                    <span class="badge badge-low" style="font-weight: 700;">🛡️ AUTHORIZED PROTECTED RECORD</span>
+                {% endif %}
+
+                {% if patient.record_sensitivity_level == 'HIGHLY_CONFIDENTIAL' %}
+                    <span class="badge badge-critical">LEVEL 3: HIGHLY CONFIDENTIAL</span>
+                {% elif patient.record_sensitivity_level == 'CONFIDENTIAL' %}
+                    <span class="badge badge-medium">LEVEL 2: CONFIDENTIAL</span>
+                {% else %}
+                    <span class="badge badge-low">LEVEL 1: NORMAL</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="ehr-patient-body">
+            <!-- PATIENT PHOTO -->
+            <div class="ehr-avatar-wrap">
+                <img src="{{ patient_photo(patient.profile_photo, is_decoy) }}" alt="{{ patient.name }}" class="ehr-avatar-img"
+                     style="border-color: {% if is_decoy %}#7c3aed{% else %}var(--turquoise-primary){% endif %};">
+                <span class="ehr-avatar-tag" style="background: {% if is_decoy %}#7c3aed{% else %}var(--turquoise-primary){% endif %};">
+                    {% if is_decoy %}DECOY{% else %}PATIENT{% endif %}
+                </span>
+            </div>
+
+            <!-- PATIENT DEMOGRAPHICS CONTAINER -->
+            <div class="ehr-info-container">
+                <!-- TOP ROW: NAME, ID & SESSION CONTROLS -->
+                <div class="ehr-primary-row">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <span class="badge badge-info" style="font-size: 0.95rem; padding: 4px 10px; font-family: var(--font-mono); font-weight: 700;">
+                                {{ patient.patient_id }}
+                            </span>
+                            <h2 class="ehr-patient-name">{{ patient.name }}</h2>
+                            <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">
+                                <i class="fa-solid fa-circle" style="font-size: 0.55rem; color: #10b981; margin-right: 4px;"></i> INPATIENT ACTIVE
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- CYBER RISK BADGE -->
+                    <div style="display: flex; align-items: center; gap: 12px; background: #f8fafc; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-light);">
+                        <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">
+                            CYBER RISK:
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="font-family: var(--font-mono); font-weight: 800; font-size: 1.15rem; color: {% if risk.score > 60 %}#dc2626{% elif risk.score > 30 %}#d97706{% else %}#059669{% endif %};">
+                                {{ risk.score }} / 100
+                            </span>
+                            <span class="badge {% if risk.score > 60 %}badge-critical{% elif risk.score > 30 %}badge-medium{% else %}badge-low{% endif %}">
+                                {{ risk.level }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CLINICAL DEMOGRAPHICS GRID -->
+                <div class="ehr-demographics-grid">
+                    <div class="ehr-data-cell">
+                        <span class="ehr-data-label"><i class="fa-solid fa-venus-mars" style="color: var(--turquoise-primary);"></i> Age &amp; Gender</span>
+                        <span class="ehr-data-value">{{ patient.age }} Years &bull; {{ patient.gender }}</span>
+                    </div>
+
+                    <div class="ehr-data-cell">
+                        <span class="ehr-data-label"><i class="fa-solid fa-droplet" style="color: #dc2626;"></i> Blood Group</span>
+                        <div>
+                            <span class="badge" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-weight: 700; font-size: 0.82rem;">
+                                <i class="fa-solid fa-droplet" style="margin-right: 4px;"></i> {{ patient.blood_group }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="ehr-data-cell">
+                        <span class="ehr-data-label"><i class="fa-solid fa-phone" style="color: var(--turquoise-primary);"></i> Phone Number</span>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span class="ehr-data-value" style="font-family: var(--font-mono); font-size: 0.92rem;">
+                                {% if is_decoy %}
+                                    {{ patient.phone_number or '+1 (555) 019-9999' }}
+                                {% elif current_user and (current_user.role == 'admin' or current_user.doctor_id == patient.assigned_doctor_id or (doctor and doctor.doctor_id == patient.assigned_doctor_id) or is_emergency) %}
+                                    {{ patient.phone_number or '+1 (555) 019-1001' }}
+                                {% else %}
+                                    {{ mask_phone(patient.phone_number) }}
+                                {% endif %}
+                            </span>
+                            {% if not is_decoy and current_user and (current_user.role == 'admin' or current_user.doctor_id == patient.assigned_doctor_id or (doctor and doctor.doctor_id == patient.assigned_doctor_id) or is_emergency) %}
+                                <span class="badge badge-low" style="font-size: 0.65rem; background: #ecfdf5; color: #047857;">VERIFIED</span>
+                            {% elif is_decoy %}
+                                <span class="badge badge-decoy" style="font-size: 0.65rem;">SYNTHETIC</span>
+                            {% else %}
+                                <span class="badge badge-critical" style="font-size: 0.65rem;">MASKED</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="ehr-data-cell">
+                        <span class="ehr-data-label"><i class="fa-solid fa-heart-pulse" style="color: #dc2626;"></i> Diagnosis / Condition</span>
+                        <div>
+                            <span class="badge badge-critical" style="font-size: 0.8rem; font-weight: 700; padding: 4px 8px; text-transform: none;">
+                                {{ patient.heart_condition_category }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="ehr-data-cell">
+                        <span class="ehr-data-label"><i class="fa-solid fa-user-doctor" style="color: var(--turquoise-primary);"></i> Attending Cardiologist</span>
+                        <span class="ehr-data-value" style="color: #0284c7;">
+                            {{ patient.assigned_doctor_name or patient.assigned_doctor_id or 'Dr. Arjun Kumar (DOC001)' }}
+                        </span>
+                    </div>
+
+                    <div class="ehr-data-cell">
+                        <span class="ehr-data-label"><i class="fa-solid fa-phone-volume" style="color: #dc2626;"></i> Emergency Contact</span>
+                        <span class="ehr-data-value" style="font-size: 0.88rem; color: #334155;">{{ patient.emergency_contact or 'Hospital Triage Unit' }}</span>
+                    </div>
+
+                    <div class="ehr-data-cell">
+                        <span class="ehr-data-label"><i class="fa-solid fa-clock-rotate-left" style="color: var(--turquoise-primary);"></i> Last Updated</span>
+                        <span class="ehr-data-value" style="font-family: var(--font-mono); font-size: 0.84rem; color: var(--text-muted);">
+                            {{ patient.last_updated or 'Today (Active Session)' }}
+                        </span>
+                    </div>
+
+                    <div class="ehr-data-cell">
+                        <span class="ehr-data-label"><i class="fa-solid fa-shield-halved" style="color: var(--turquoise-primary);"></i> Security Access Mode</span>
+                        <span class="ehr-data-value" style="color: {% if is_decoy %}#7c3aed{% else %}#059669{% endif %}; font-size: 0.88rem;">
+                            {{ 'DECOY HONEYPOT MODE' if is_decoy else 'PROTECTED VAULT ACCESS' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================
+         SECTION 2: REAL-TIME CONTINUOUS CARDIAC TELEMETRY (ECG + VITALS)
+         ==================================================================== -->
+    <div class="card ecg-monitor-card" style="margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.82rem; color: var(--text-secondary); flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="color: #0284c7; font-weight: 700; font-size: 0.88rem;">
+                    🫀 CONTINUOUS CARDIAC TELEMETRY • LEAD II REAL-TIME MONITOR
+                </span>
+                <span class="badge badge-info" style="font-size: 0.68rem;">SWEEP: 25mm/s • CAL: 10mm/mV</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <span>CONDITION: <strong style="color: #dc2626;">{{ patient.heart_condition_category }}</strong></span>
+                <span class="badge badge-critical">● LIVE TELEMETRY</span>
+            </div>
+        </div>
+
+        <div class="ecg-canvas-wrapper">
+            <canvas id="patientEcgCanvas" style="width: 100%; height: 130px; display: block;"></canvas>
+        </div>
+
+        <div style="margin-top: 10px; font-size: 0.8rem; color: var(--text-secondary); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <span>ECG DIAGNOSTIC REPORT: <strong style="color: var(--text-main);">{{ patient.ecg_report }}</strong></span>
+            <span style="color: #0284c7; font-weight: 600;">Clinical Telemetry Monitor Active</span>
+        </div>
+    </div>
+
+    <!-- CARDIAC VITALS TELEMETRY STRIP (CLEAN FORMATTED METRICS - ZERO RAW JSON) -->
+    {% set v = format_vitals(patient.vitals) %}
+    <div class="stats-grid" style="margin-bottom: 24px;">
+        <div class="stat-card" style="border-left-color: #ef4444;">
+            <div class="stat-header">
+                <span class="stat-label">HEART RATE</span>
+                <span class="stat-icon-bubble" style="background: #fee2e2; color: #dc2626;">💓</span>
+            </div>
+            <div class="stat-value" style="color: #dc2626; font-size: 1.35rem; font-family: var(--font-mono);">
+                {{ v.heart_rate }}
+            </div>
+            <div class="stat-sub">Continuous biometric telemetry</div>
+        </div>
+
+        <div class="stat-card" style="border-left-color: #0284c7;">
+            <div class="stat-header">
+                <span class="stat-label">BLOOD PRESSURE</span>
+                <span class="stat-icon-bubble" style="background: #e0f2fe; color: #0284c7;">🩺</span>
+            </div>
+            <div class="stat-value" style="color: #0284c7; font-size: 1.35rem; font-family: var(--font-mono);">
+                {{ v.blood_pressure }}
+            </div>
+            <div class="stat-sub">Non-invasive arterial pressure</div>
+        </div>
+
+        <div class="stat-card" style="border-left-color: #059669;">
+            <div class="stat-header">
+                <span class="stat-label">OXYGEN SATURATION (SpO2)</span>
+                <span class="stat-icon-bubble" style="background: #ecfdf5; color: #059669;">🫁</span>
+            </div>
+            <div class="stat-value" style="color: #059669; font-size: 1.35rem; font-family: var(--font-mono);">
+                {{ v.spo2 }}
+            </div>
+            <div class="stat-sub">Pulse oximetry waveform</div>
+        </div>
+
+        <div class="stat-card" style="border-left-color: #7c3aed;">
+            <div class="stat-header">
+                <span class="stat-label">CARDIAC RHYTHM</span>
+                <span class="stat-icon-bubble" style="background: #f5f3ff; color: #7c3aed;">⚡</span>
+            </div>
+            <div class="stat-value" style="color: #7c3aed; font-size: 1.05rem; font-weight: 700; line-height: 1.3;">
+                {{ v.rhythm }}
+            </div>
+            <div class="stat-sub">Telemetry Lead II status</div>
+        </div>
+    </div>
+
+    <!-- ====================================================================
+         SECTION 3: MEDICATIONS & PHARMACOTHERAPY REGIMEN (CLEAN HOSPITAL UI)
+         ==================================================================== -->
+    {% set medications = parse_medications(patient.current_prescriptions) %}
+    <div class="medication-section">
+        <div class="medication-section-header">
+            <div>
+                <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--navy-primary); display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-pills" style="color: var(--turquoise-primary);"></i> MEDICATIONS &bull; ACTIVE PHARMACOTHERAPY REGIMEN
+                </h3>
+                <p style="margin: 4px 0 0 0; font-size: 0.84rem; color: var(--text-muted);">
+                    Current inpatient and outpatient cardiology prescriptions, administration routes, and dosage schedules.
+                </p>
+            </div>
+
+            <!-- CONTROLS & BADGE -->
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span class="badge badge-low" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: 700; font-size: 0.78rem; padding: 6px 12px;">
+                    <i class="fa-solid fa-prescription" style="margin-right: 4px;"></i> {{ medications | length }} Active Prescriptions
+                </span>
+
+                <!-- VIEW TOGGLE BUTTONS (CARDS VS STRUCTURED TABLE) -->
+                <div style="display: inline-flex; border: 1px solid var(--border-light); border-radius: 6px; overflow: hidden; background: #ffffff;">
+                    <button type="button" id="btnMedCards" onclick="switchMedsView('cards')" class="btn btn-sm"
+                            style="background: #f0fdfa; color: var(--turquoise-primary); font-weight: 700; border: none; border-radius: 0; padding: 5px 12px; display: inline-flex; align-items: center; gap: 5px;">
+                        <i class="fa-solid fa-grip"></i> Cards View
+                    </button>
+                    <button type="button" id="btnMedTable" onclick="switchMedsView('table')" class="btn btn-sm"
+                            style="background: #ffffff; color: var(--text-muted); font-weight: 600; border: none; border-radius: 0; padding: 5px 12px; display: inline-flex; align-items: center; gap: 5px;">
+                        <i class="fa-solid fa-table-list"></i> Table View
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW A: MODERN HOSPITAL MEDICATION CARDS (DEFAULT) -->
+        <div id="medsCardsView" class="medication-cards-grid">
+            {% for med in medications %}
+            <div class="medication-card">
+                <div>
+                    <div class="med-card-top">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="med-icon-wrap">
+                                <i class="{{ med.icon }}"></i>
+                            </div>
+                            <div class="med-card-info">
+                                <h4 class="med-drug-name">{{ med.name }}</h4>
+                                <span class="med-category-tag">
+                                    <i class="fa-solid fa-tag" style="font-size: 0.65rem; margin-right: 3px;"></i> {{ med.category }}
+                                </span>
+                            </div>
+                        </div>
+                        <span class="badge badge-low" style="font-size: 0.68rem; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700; white-space: nowrap;">
+                            <i class="fa-solid fa-circle-check" style="font-size: 0.6rem; color: #10b981; margin-right: 3px;"></i> Active
+                        </span>
+                    </div>
+
+                    <div class="med-attributes-grid">
+                        <div class="med-attr-item">
+                            <span class="med-attr-label"><i class="fa-solid fa-weight-scale" style="color: var(--turquoise-primary);"></i> Dose</span>
+                            <span class="med-attr-value med-dose-val">{{ med.dose }}</span>
+                        </div>
+                        <div class="med-attr-item">
+                            <span class="med-attr-label"><i class="fa-solid fa-route" style="color: #0284c7;"></i> Route</span>
+                            <span class="med-route-badge {{ med.route_class }}">{{ med.route }}</span>
+                        </div>
+                        <div class="med-attr-item">
+                            <span class="med-attr-label"><i class="fa-solid fa-clock" style="color: #d97706;"></i> Frequency</span>
+                            <span class="med-attr-value" style="color: #0284c7;">{{ med.frequency }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: var(--text-muted);">
+                    <span><i class="fa-solid fa-prescription-bottle" style="color: var(--turquoise-primary); margin-right: 4px;"></i> Electronic Rx Verified</span>
+                    <span>Hospital Pharmacy Monitored</span>
+                </div>
+            </div>
+            {% else %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 36px; color: var(--text-muted);">
+                <i class="fa-solid fa-prescription-bottle" style="font-size: 2.2rem; color: #cbd5e1; margin-bottom: 10px; display: block;"></i>
+                <strong>No Active Pharmacotherapy Orders</strong>
+                <p style="margin: 4px 0 0 0; font-size: 0.82rem;">This patient chart currently has no active prescriptions recorded.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- VIEW B: STRUCTURED MEDICAL EHR TABLE (TOGGLEABLE) -->
+        <div id="medsTableView" style="display: none; padding: 0;">
+            <div class="table-container" style="margin: 0; border: none; border-radius: 0;">
+                <table class="ehr-med-table">
+                    <thead>
+                        <tr>
+                            <th>Medicine Name &amp; Classification</th>
+                            <th>Dose / Strength</th>
+                            <th>Route</th>
+                            <th>Frequency / Administration Schedule</th>
+                            <th>Order Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for med in medications %}
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="med-icon-wrap" style="width: 34px; height: 34px; font-size: 1rem;">
+                                        <i class="{{ med.icon }}"></i>
+                                    </div>
+                                    <div>
+                                        <strong style="color: var(--navy-primary); font-size: 0.95rem;">{{ med.name }}</strong>
+                                        <div style="font-size: 0.74rem; color: var(--text-muted);">{{ med.category }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="med-dose-val" style="font-size: 0.95rem; font-weight: 700;">{{ med.dose }}</span>
+                            </td>
+                            <td>
+                                <span class="med-route-badge {{ med.route_class }}">{{ med.route }}</span>
+                            </td>
+                            <td>
+                                <span style="font-weight: 700; color: #0284c7; display: flex; align-items: center; gap: 5px;">
+                                    <i class="fa-solid fa-clock-rotate-left" style="font-size: 0.75rem; color: var(--text-muted);"></i> {{ med.frequency }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">
+                                    <i class="fa-solid fa-circle-check" style="color: #10b981; font-size: 0.65rem; margin-right: 4px;"></i> Active Order
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                                No active pharmacological medications recorded in this chart.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================
+         SECTION 4: DIAGNOSTICS, ECHO, BLOOD TESTS & PROGRESS NOTES (GRID-2)
+         ==================================================================== -->
+    <div class="grid-2" style="margin-bottom: 24px;">
+        <!-- LEFT: MEDICAL HISTORY & DIAGNOSTICS -->
+        <div class="card" style="box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
+            <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px;">
+                <h3 class="card-title" style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--navy-primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-file-waveform" style="color: var(--turquoise-primary);"></i> Medical History &amp; Diagnostic Reports
+                </h3>
+            </div>
+
+            <div style="padding: 20px;">
+                <div style="margin-bottom: 16px;">
+                    <label class="form-label" style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">
+                        Medical History Summary
+                    </label>
+                    <div style="font-size: 0.88rem; color: var(--text-main); background: #f8fafc; padding: 12px 14px; border-radius: 6px; border: 1px solid var(--border-light); line-height: 1.55;">
+                        {{ patient.medical_history }}
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label class="form-label" style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">
+                        Echocardiogram (Echo) Diagnostic Report
+                    </label>
+                    <div style="font-size: 0.88rem; color: var(--text-main); background: #f8fafc; padding: 12px 14px; border-radius: 6px; border: 1px solid var(--border-light); line-height: 1.55;">
+                        {{ patient.echo_report }}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label" style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">
+                        Blood Test &amp; Cardiac Biomarkers
+                    </label>
+                    <div style="font-size: 0.88rem; color: var(--text-main); background: #f8fafc; padding: 12px 14px; border-radius: 6px; border: 1px solid var(--border-light); line-height: 1.55;">
+                        {{ patient.blood_test_report }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: CLINICAL PROGRESS NOTES -->
+        <div class="card" style="box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
+            <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px;">
+                <h3 class="card-title" style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--navy-primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-notes-medical" style="color: var(--turquoise-primary);"></i> Clinical Progress Notes &amp; Observations
+                </h3>
+            </div>
+
+            <div style="padding: 20px;">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 16px 0; line-height: 1.5;">
+                    Authorized clinicians can append verified progress observations to this patient record. All updates are recorded with cryptographic timestamps and audited in the SOC register.
+                </p>
+
+                <!-- CLINICAL PROGRESS NOTE UPDATE FORM -->
+                {% if not is_decoy and current_user and current_user.role in ('doctor', 'admin') %}
+                <form action="{{ url_for('patients.update_clinical_notes', patient_id=patient.patient_id) }}" method="POST">
+                    <div style="margin-bottom: 14px;">
+                        <label class="form-label" style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">
+                            Add Clinical Progress Note
+                        </label>
+                        <textarea name="clinical_notes" class="form-control" rows="4" placeholder="Enter updated clinical observations, diuresis titration, catheterization findings, or telemetry review..." required style="padding: 10px; font-size: 0.85rem;"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Clinical Progress Note
+                    </button>
+                </form>
+                {% else %}
+                <div style="font-size: 0.84rem; color: var(--text-muted); background: #f8fafc; padding: 14px; border-radius: 6px; border: 1px solid var(--border-light); display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-lock" style="color: #64748b; font-size: 1.2rem;"></i>
+                    <span>Chart editing locked. Session running in Read-Only or Protected Zero-Trust Mode.</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================
+         SECTION 5: CONFIDENTIAL RECORDS DOSSIER (IF APPLICABLE)
+         ==================================================================== -->
+    {% if confidential_docs %}
+    <div class="card" style="border-left: 4px solid #7c3aed; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);">
+        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="card-title" style="color: #6d28d9; margin: 0; font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-vault"></i> High-Sensitivity Confidential Dossiers Vault
+            </h3>
+            <span class="badge badge-high">SENSITIVE DOSSIER CLEARED</span>
+        </div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Confidential Record ID</th>
+                        <th>Category</th>
+                        <th>Clearance Level</th>
+                        <th>Clinical Content</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc_item in confidential_docs %}
+                    <tr>
+                        <td style="font-family: var(--font-mono); color: #0284c7; font-weight: 700;">{{ doc_item.record_id }}</td>
+                        <td><strong>{{ doc_item.record_type }}</strong></td>
+                        <td>
+                            <span class="badge badge-high">{{ doc_item.sensitivity_level }}</span>
+                        </td>
+                        <td style="font-size: 0.85rem; color: var(--text-main);">{{ doc_item.content }}</td>
+                        <td style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted);">{{ doc_item.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ====================================================================
+         SECTION 6: RISK ENGINE DYNAMIC CALCULATION FACTORS
+         ==================================================================== -->
+    <div class="card" style="border-left: 4px solid var(--primary-blue); box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);">
+        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <h3 class="card-title" style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--navy-primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-shield-halved" style="color: var(--turquoise-primary);"></i> Risk-Based Access Control Evaluation Breakdown
+                </h3>
+                <p class="card-subtitle" style="margin: 3px 0 0 0; font-size: 0.8rem; color: var(--text-muted);">
+                    Zero-trust security factors calculated by Risk Engine on this clinical access request.
+                </p>
+            </div>
+            <span class="badge {% if risk.score > 60 %}badge-critical{% elif risk.score > 30 %}badge-medium{% else %}badge-low{% endif %}" style="font-size: 0.85rem; padding: 6px 12px;">
+                Final Risk Score: {{ risk.score }} / 100
+            </span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Security Factor</th>
+                        <th>Impact Delta</th>
+                        <th>Status</th>
+                        <th>Forensic Explanation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in risk.factors %}
+                    <tr>
+                        <td><strong>{{ f.name }}</strong></td>
+                        <td style="font-family: var(--font-mono); font-weight: 700; color: {% if f.score > 0 %}#dc2626{% else %}#059669{% endif %};">
+                            {% if f.score > 0 %}+{{ f.score }}{% else %}{{ f.score }}{% endif %}
+                        </td>
+                        <td>
+                            {% if f.status in ('PASS', 'NORMAL') %}
+                                <span class="badge badge-low">{{ f.status }}</span>
+                            {% elif f.status in ('WARN', 'ELEVATED') %}
+                                <span class="badge badge-medium">{{ f.status }}</span>
+                            {% else %}
+                                <span class="badge badge-critical">{{ f.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="font-size: 0.82rem; color: var(--text-secondary);">{{ f.description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/ecg_visualizer.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const isDecoy = {{ 'true' if is_decoy else 'false' }};
+    const condition = "{{ patient.heart_condition_category }}";
+
+    let rhythmType = 'SINUS';
+    if (condition.includes('STEMI') || condition.includes('Infarction')) {
+        rhythmType = 'STEMI';
+    } else if (condition.includes('Ventricular') || condition.includes('Tachycardia') || condition.includes('VT')) {
+        rhythmType = 'VT';
+    }
+
+    // Initialize Canvas visualizer with hospital clinical grid
+    new ECGVisualizer('patientEcgCanvas', rhythmType, 75, isDecoy);
+});
+
+// Switch between Medication Cards View and Structured Table View
+function switchMedsView(mode) {
+    const cardsView = document.getElementById('medsCardsView');
+    const tableView = document.getElementById('medsTableView');
+    const btnCards = document.getElementById('btnMedCards');
+    const btnTable = document.getElementById('btnMedTable');
+
+    if (!cardsView || !tableView) return;
+
+    if (mode === 'cards') {
+        cardsView.style.display = 'grid';
+        tableView.style.display = 'none';
+        btnCards.style.background = '#f0fdfa';
+        btnCards.style.color = 'var(--turquoise-primary)';
+        btnCards.style.fontWeight = '700';
+        btnTable.style.background = '#ffffff';
+        btnTable.style.color = 'var(--text-muted)';
+        btnTable.style.fontWeight = '600';
+    } else {
+        cardsView.style.display = 'none';
+        tableView.style.display = 'block';
+        btnTable.style.background = '#f0fdfa';
+        btnTable.style.color = 'var(--turquoise-primary)';
+        btnTable.style.fontWeight = '700';
+        btnCards.style.background = '#ffffff';
+        btnCards.style.color = 'var(--text-muted)';
+        btnCards.style.fontWeight = '600';
+    }
+}
+</script>
+{% endblock %}

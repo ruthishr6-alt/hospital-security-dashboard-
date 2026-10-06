@@ -1,0 +1,469 @@
+{% extends "base.html" %}
+
+{% block title %}HeartSecure - Protecting Critical Heart Patient Records With Intelligent Cybersecurity{% endblock %}
+
+{% block content %}
+<!-- ====================================================================
+     HERO SECTION
+     ==================================================================== -->
+<section class="hero-section" id="home">
+    <div class="hero-grid">
+        <!-- Hero Left Content -->
+        <div>
+            <div class="hero-badge">
+                <i class="fa-solid fa-shield-heart"></i> SECURE DIGITAL HEALTHCARE
+            </div>
+
+            <h1 class="hero-title">
+                Protecting Critical Heart Patient Records With <span>Intelligent Cybersecurity</span>
+            </h1>
+
+            <p class="hero-desc">
+                A secure healthcare platform designed to protect sensitive heart patient records using risk-based access control, threat detection and controlled security monitoring.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="#secure-access" class="btn btn-primary btn-lg">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Access Dashboard
+                </a>
+                <a href="#about" class="btn btn-secondary btn-lg">
+                    <i class="fa-solid fa-circle-info"></i> Learn More
+                </a>
+            </div>
+
+            <!-- Trust Metrics Strip -->
+            <div class="hero-trust-metrics">
+                <div class="trust-item">
+                    <i class="fa-solid fa-shield-halved"></i> 100% Real DB Shielding
+                </div>
+                <div class="trust-item">
+                    <i class="fa-solid fa-lock"></i> Zero Data Leakage
+                </div>
+                <div class="trust-item">
+                    <i class="fa-solid fa-clock-rotate-left"></i> 15-Min Break-Glass Protocol
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero Right: Image with Floating Defense Card -->
+        <div class="hero-image-container">
+            <img src="{{ url_for('static', filename='img/hero_hospital_doctors.jpg') }}" alt="HeartSecure Cardiologists" class="hero-image">
+            <div class="floating-defense-card">
+                <div class="floating-defense-icon">
+                    <i class="fa-solid fa-masks-theater"></i>
+                </div>
+                <div>
+                    <div style="font-size: 0.85rem; font-weight: 800; color: var(--navy-primary);">
+                        CardioShield Active Defense
+                    </div>
+                    <div style="font-size: 0.74rem; color: var(--text-muted);">
+                        Level 4 Honeypot Deception Active
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====================================================================
+     APPOINTMENT-STYLE SECURITY CARD (SECURE ACCESS)
+     ==================================================================== -->
+<section style="margin-bottom: 70px;" id="secure-access">
+    <div class="security-access-card">
+        <div class="security-access-header">
+            <div>
+                <h2 class="security-access-title">
+                    <i class="fa-solid fa-hospital-user" style="color: var(--turquoise-primary);"></i> Secure Access
+                </h2>
+                <p style="font-size: 0.84rem; color: var(--text-muted); margin: 3px 0 0;">
+                    Zero-Trust Clinical Authentication &bull; Multi-Factor Verification Required
+                </p>
+            </div>
+            <span class="badge badge-info" style="font-size: 0.8rem; padding: 6px 12px;">
+                <i class="fa-solid fa-key" style="margin-right: 4px;"></i> MFA &amp; Zero-Trust Enforced
+            </span>
+        </div>
+
+        <!-- Academic Disclaimer Banner -->
+        <div style="background: #f0fdfa; border: 1px solid #b2ebf2; border-left: 4px solid var(--turquoise-primary); padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <span style="color: #007799; font-size: 0.84rem; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-shield-halved"></i> ACADEMIC CYBERSECURITY PROTOTYPE &bull; DEMO DATA ONLY
+            </span>
+            <span style="color: var(--text-muted); font-size: 0.78rem;">
+                Critical Heart Patient Cyber Security System
+            </span>
+        </div>
+
+        {% if failed_risk %}
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #ef4444; border-radius: 8px; padding: 14px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <strong style="color: #b91c1c; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Security Threat Detected
+                </strong>
+                <span class="badge badge-critical" style="font-weight: 700;">Risk: {{ failed_risk.score }}/100</span>
+            </div>
+            <div style="font-size: 0.82rem; color: #475569;">
+                Threshold: <strong>{{ failed_risk.level }}</strong> &bull; Action: Blocked &amp; Audited into Deception Sandbox
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Secure Login Form -->
+        <form action="{{ url_for('auth.login') }}" method="POST">
+            <div class="grid-3" style="gap: 16px; margin-bottom: 18px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="username">
+                        <i class="fa-solid fa-id-badge" style="color: var(--turquoise-primary); margin-right: 4px;"></i> User ID / Clinician ID
+                    </label>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="e.g. admin_demo or doctor_demo_01" value="{{ username or '' }}" required autofocus>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="password">
+                        <i class="fa-solid fa-lock" style="color: var(--turquoise-primary); margin-right: 4px;"></i> Password
+                    </label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="••••••••••••" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="device_id">
+                        <i class="fa-solid fa-laptop-medical" style="color: var(--turquoise-primary); margin-right: 4px;"></i> Role / Hardware Terminal
+                    </label>
+                    <select id="device_id" name="device_id" class="form-control">
+                        {% for dev in all_devices %}
+                            <option value="{{ dev.device_id }}">
+                                {{ dev.device_name }} ({{ dev.device_status }}: {{ dev.risk_contribution }} Risk)
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+                <i class="fa-solid fa-shield-check"></i> Secure Login
+            </button>
+        </form>
+
+        <!-- New User Profile Registration Options -->
+        <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: 8px; padding: 14px 18px; margin: 16px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+                <strong style="color: var(--navy-primary); font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-address-card" style="color: var(--turquoise-primary);"></i> Need to Register a New Profile?
+                </strong>
+                <span style="color: var(--text-muted); font-size: 0.8rem;">
+                    Create your own clinical cardiologist profile or synthetic heart patient record.
+                </span>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <a href="{{ url_for('auth.create_doctor_profile') }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--navy-primary);">
+                    <i class="fa-solid fa-user-doctor" style="color: var(--turquoise-primary);"></i> Create Doctor Profile
+                </a>
+                <a href="{{ url_for('auth.create_patient_profile') }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: #0284c7;">
+                    <i class="fa-solid fa-heart-pulse" style="color: #ef4444;"></i> Create Patient Profile
+                </a>
+            </div>
+        </div>
+
+        <!-- 1-Click Evaluation Accounts -->
+        <div style="padding-top: 14px; border-top: 1px solid var(--border-light);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <span style="font-size: 0.74rem; font-weight: 800; color: var(--navy-secondary); text-transform: uppercase; letter-spacing: 0.05em;">
+                    ⚡ 1-Click Evaluation Credentials:
+                </span>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">Click to auto-fill form</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setCredentials('admin_demo', 'AdminDemo#2026!', 'DEV-ADMIN-TRUSTED')">
+                    <i class="fa-solid fa-user-shield" style="color: var(--turquoise-primary);"></i> <strong>Admin Hayes</strong> (SOC)
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setCredentials('doctor_demo_01', 'DoctorDemo#2026!', 'DEV-DOC01-TRUSTED')">
+                    <i class="fa-solid fa-user-doctor" style="color: var(--green-normal);"></i> <strong>Dr. Lin</strong> (Senior)
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setCredentials('doctor_demo_02', 'DoctorDemo#2026!', 'DEV-DOC02-TRUSTED')">
+                    <i class="fa-solid fa-user-doctor" style="color: #6366f1;"></i> <strong>Dr. Vance</strong> (Staff)
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setCredentials('doctor_demo_03', 'DoctorDemo#2026!', 'DEV-DOC03-TRUSTED')">
+                    <i class="fa-solid fa-user-doctor" style="color: var(--orange-warning);"></i> <strong>Dr. Rostova</strong> (Resident)
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" style="background: #fff1f2; border-color: #fecdd3; color: #e11d48;" onclick="setCredentials('attacker_user', 'WrongPass999!', 'DEV-UNKNOWN-EXT-88')">
+                    <i class="fa-solid fa-biohazard"></i> <strong>Attacker Simulation</strong> (Untrusted Device)
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====================================================================
+     ABOUT / PLATFORM SECTION
+     ==================================================================== -->
+<section class="content-section" id="about" style="background: #ffffff; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+    <div class="section-header-center">
+        <span class="section-tag"><i class="fa-solid fa-microchip"></i> Platform Architecture</span>
+        <h2 class="section-title">Advanced Healthcare Security</h2>
+        <p class="section-desc">
+            Combining critical cardiac electronic medical records with real-time cybersecurity telemetry.
+        </p>
+    </div>
+
+    <div class="grid-2" style="align-items: center; gap: 48px;">
+        <!-- Left: Medical Image -->
+        <div>
+            <img src="{{ url_for('static', filename='img/about_cardiology_security.jpg') }}" alt="Cardiology ICU Cybersecurity" style="width: 100%; height: 420px; object-fit: cover; border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); border: 4px solid #ffffff;">
+        </div>
+
+        <!-- Right: Description & 4 Circular Turquoise Icons -->
+        <div>
+            <h3 style="font-size: 1.6rem; font-weight: 800; color: var(--navy-primary); margin-bottom: 14px; line-height: 1.3;">
+                Protecting Critical Heart Patient Information
+            </h3>
+            <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.65; margin-bottom: 24px;">
+                HeartSecure is engineered to safeguard critical heart patient electronic records against unauthorized cross-patient traversal, credential theft, and lateral insider intrusions. By coupling clinical cardiology workflows with dynamic Zero-Trust heuristics, patient vitals and sensitive waveforms stay protected around the clock.
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Feature 1 -->
+                <div style="display: flex; gap: 14px; align-items: flex-start;">
+                    <div class="icon-circle-turquoise">
+                        <i class="fa-solid fa-file-shield"></i>
+                    </div>
+                    <div>
+                        <strong style="color: var(--navy-primary); font-size: 0.92rem; display: block; margin-bottom: 3px;">Secure Records</strong>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; display: block;">
+                            Isolated cardiac EMR charts, waveforms, and diagnostic panels.
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div style="display: flex; gap: 14px; align-items: flex-start;">
+                    <div class="icon-circle-turquoise">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                    </div>
+                    <div>
+                        <strong style="color: var(--navy-primary); font-size: 0.92rem; display: block; margin-bottom: 3px;">Risk-Based Access</strong>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; display: block;">
+                            Dynamic 0–100 risk score balancing role, patient, and terminal.
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div style="display: flex; gap: 14px; align-items: flex-start;">
+                    <div class="icon-circle-turquoise">
+                        <i class="fa-solid fa-radar"></i>
+                    </div>
+                    <div>
+                        <strong style="color: var(--navy-primary); font-size: 0.92rem; display: block; margin-bottom: 3px;">Threat Detection</strong>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; display: block;">
+                            Automated heuristics defusing brute-force and rapid scraping.
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div style="display: flex; gap: 14px; align-items: flex-start;">
+                    <div class="icon-circle-turquoise">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <strong style="color: var(--navy-primary); font-size: 0.92rem; display: block; margin-bottom: 3px;">Privacy Protection</strong>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; display: block;">
+                            Zero real data exposure with honeypot containment traps.
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====================================================================
+     SERVICES / FEATURES SECTION (8 SERVICE CARDS)
+     ==================================================================== -->
+<section class="content-section" id="services">
+    <div class="section-header-center">
+        <span class="section-tag"><i class="fa-solid fa-stethoscope"></i> Integrated Defense</span>
+        <h2 class="section-title">Complete Healthcare Security Services</h2>
+        <p class="section-desc">
+            Eight essential defensive mechanisms engineered specifically for hospital cardiovascular wards.
+        </p>
+    </div>
+
+    <div class="grid-4" style="gap: 20px;">
+        <!-- Card 1 -->
+        <div class="service-card">
+            <div class="icon-circle-turquoise">
+                <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+            <h3 class="service-card-title">1. Critical Heart Patient Records</h3>
+            <p class="service-card-desc">
+                Continuous cardiac telemetry tracking, vitals strips, and catheterization note repositories for high-risk ICU inpatients.
+            </p>
+            <span class="badge badge-low" style="align-self: flex-start;">EMR Vault</span>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="service-card">
+            <div class="icon-circle-turquoise">
+                <i class="fa-solid fa-user-doctor"></i>
+            </div>
+            <h3 class="service-card-title">2. Secure Doctor Access</h3>
+            <p class="service-card-desc">
+                Rigorous patient-specific authorization. Attending physicians only view assigned cases; probing others triggers security logging.
+            </p>
+            <span class="badge badge-low" style="align-self: flex-start;">RBAC 2.0</span>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="service-card">
+            <div class="icon-circle-turquoise">
+                <i class="fa-solid fa-scale-balanced"></i>
+            </div>
+            <h3 class="service-card-title">3. Risk-Based Authorization</h3>
+            <p class="service-card-desc">
+                Mathematical 0–100 risk formulation factoring credential validity, verified hardware terminals, and access hour velocity.
+            </p>
+            <span class="badge badge-info" style="align-self: flex-start;">Risk Engine</span>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="service-card">
+            <div class="icon-circle-turquoise">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 class="service-card-title">4. Medical Record Protection</h3>
+            <p class="service-card-desc">
+                Three-tiered record sensitivity classification (Normal, Confidential, Highly Confidential) guarding genetic and transplant dossiers.
+            </p>
+            <span class="badge badge-medium" style="align-self: flex-start;">Tiered Vault</span>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="service-card">
+            <div class="icon-circle-turquoise">
+                <i class="fa-solid fa-radar"></i>
+            </div>
+            <h3 class="service-card-title">5. Threat Detection</h3>
+            <p class="service-card-desc">
+                Active intrusion detection monitoring suspicious SQL injection tokens, unauthorized page probing, and repeated failed logins.
+            </p>
+            <span class="badge badge-critical" style="align-self: flex-start;">IDS / IPS</span>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="service-card">
+            <div class="icon-circle-turquoise">
+                <i class="fa-solid fa-kit-medical"></i>
+            </div>
+            <h3 class="service-card-title">6. Emergency Break-Glass Access</h3>
+            <p class="service-card-desc">
+                Time-limited 15-minute emergency override protocol with mandatory clinical justification, pre/post risk elevation, and SOC dispatch.
+            </p>
+            <span class="badge badge-critical" style="align-self: flex-start;">15-Min Grant</span>
+        </div>
+
+        <!-- Card 7 -->
+        <div class="service-card">
+            <div class="icon-circle-turquoise">
+                <i class="fa-solid fa-user-secret"></i>
+            </div>
+            <h3 class="service-card-title">7. Insider Threat Detection</h3>
+            <p class="service-card-desc">
+                Heuristic velocity analysis detecting authenticated clinicians attempting rapid bulk record scraping or unauthorized queries.
+            </p>
+            <span class="badge badge-decoy" style="align-self: flex-start;">Behavioral IDS</span>
+        </div>
+
+        <!-- Card 8 -->
+        <div class="service-card">
+            <div class="icon-circle-turquoise">
+                <i class="fa-solid fa-masks-theater"></i>
+            </div>
+            <h3 class="service-card-title">8. Decoy Security Monitoring</h3>
+            <p class="service-card-desc">
+                Honeypot deception chamber serving 10 isolated canary patients. High-risk sessions are seamlessly shunted into fake sandboxes.
+            </p>
+            <span class="badge badge-decoy" style="align-self: flex-start;">Honeypot Shield</span>
+        </div>
+    </div>
+</section>
+
+<!-- ====================================================================
+     DOCTORS SECTION
+     ==================================================================== -->
+<section class="content-section" id="doctors" style="background: #ffffff; border-top: 1px solid var(--border-light);">
+    <div class="section-header-center">
+        <span class="section-tag"><i class="fa-solid fa-user-doctor"></i> Medical Specialists</span>
+        <h2 class="section-title">Our Qualified Healthcare Professionals</h2>
+        <p class="section-desc">
+            Credentialed cardiologists and cardiac care specialists actively managing monitored ICU inpatients.
+        </p>
+    </div>
+
+    <div class="grid-4" style="gap: 20px;">
+        {% for doc in doctors %}
+        <div class="doctor-card">
+            <div class="doctor-card-photo-wrap">
+                <img src="{{ doctor_photo(doc.profile_photo) }}" alt="{{ doc.name }}" class="doctor-card-photo">
+                <span class="doctor-status-badge">● Active</span>
+            </div>
+
+            <h3 class="doctor-card-name">{{ doc.name }}</h3>
+            <div class="doctor-card-spec">{{ doc.specialization or doc.specialty }}</div>
+            <div class="doctor-card-meta">
+                <code>{{ doc.doctor_id }}</code> &bull; {{ doc.department }}
+            </div>
+
+            <div class="doctor-card-info-list">
+                <div class="doctor-card-info-item">
+                    <span style="color: var(--text-muted);">Qualification:</span>
+                    <strong style="color: var(--navy-primary);">{{ doc.qualification or 'MBBS, MD Cardiology' }}</strong>
+                </div>
+                <div class="doctor-card-info-item">
+                    <span style="color: var(--text-muted);">Experience:</span>
+                    <strong style="color: var(--navy-primary);">{{ doc.experience or '8 Years' }}</strong>
+                </div>
+                <div class="doctor-card-info-item">
+                    <span style="color: var(--text-muted);">Assigned Patients:</span>
+                    <strong style="color: var(--turquoise-primary);">{{ doc.patient_count|default(2) }} Patients</strong>
+                </div>
+                <div class="doctor-card-info-item">
+                    <span style="color: var(--text-muted);">Clearance:</span>
+                    <span class="badge {% if doc.permission_level == 'HIGHLY_CONFIDENTIAL' %}badge-high{% elif doc.permission_level == 'CONFIDENTIAL' %}badge-medium{% else %}badge-low{% endif %}" style="font-size: 0.65rem;">
+                        {{ doc.permission_level }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Contact icons -->
+            <div style="display: flex; justify-content: center; gap: 8px; margin-top: auto;">
+                <a href="mailto:{{ doc.user_email or doc.email }}" class="btn btn-secondary btn-sm" style="width: 32px; height: 32px; border-radius: 50%; padding: 0;" title="Email Clinician">
+                    <i class="fa-solid fa-envelope" style="font-size: 0.75rem;"></i>
+                </a>
+                <a href="tel:{{ doc.demo_phone or '+15550192834' }}" class="btn btn-secondary btn-sm" style="width: 32px; height: 32px; border-radius: 50%; padding: 0;" title="Call Demo Phone">
+                    <i class="fa-solid fa-phone" style="font-size: 0.75rem;"></i>
+                </a>
+                <a href="#secure-access" class="btn btn-primary btn-sm" style="font-size: 0.74rem; padding: 4px 10px;" onclick="setCredentials('{{ doc.username }}', 'DoctorDemo#2026!', 'DEV-DOC01-TRUSTED')">
+                    Login As &rarr;
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<script>
+function setCredentials(u, p, dev) {
+    document.getElementById('username').value = u;
+    document.getElementById('password').value = p;
+    if (dev) {
+        document.getElementById('device_id').value = dev;
+    }
+    // Smooth scroll to login form
+    const formElement = document.getElementById('secure-access');
+    if (formElement) {
+        formElement.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HeartSecure - Critical Heart Patient Cyber Security System{% endblock %}</title>
+
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Hospital Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- ====================================================================
+         HOSPITAL TOP NAVBAR (WHITE WITH DARK NAVY & TURQUOISE ACCENTS)
+         ==================================================================== -->
+    <header class="hospital-navbar">
+        <div class="navbar-container">
+            <!-- Left: Medical Shield/Heart Security Logo -->
+            <a href="{{ url_for('home') }}" class="brand-link" title="HeartSecure Clinical Platform">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-shield-heart"></i>
+                </div>
+                <div class="brand-text-wrap">
+                    <span class="brand-title">Heart<span>Secure</span></span>
+                    <span class="brand-subtitle">Critical Heart Patient Cyber Security System</span>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav>
+                <ul class="nav-menu" id="desktopNav">
+                    <li>
+                        <a href="{{ url_for('home') }}" class="nav-link {% if request.path in ['/', '/home'] %}active{% endif %}">
+                            <i class="fa-solid fa-house-medical"></i> Home
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% if session.get('role') == 'admin' %}{{ url_for('admin.dashboard') }}{% elif session.get('role') == 'doctor' %}{{ url_for('doctor.dashboard') }}{% else %}{{ url_for('auth.login') }}{% endif %}" class="nav-link {% if 'dashboard' in request.path %}active{% endif %}">
+                            <i class="fa-solid fa-chart-line"></i> Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% if session.get('role') == 'admin' %}{{ url_for('admin.manage_users') }}{% else %}{{ url_for('home') }}#doctors{% endif %}" class="nav-link {% if 'users' in request.path %}active{% endif %}">
+                            <i class="fa-solid fa-user-doctor"></i> Doctors
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('patients.patient_list') }}" class="nav-link {% if '/patient' in request.path %}active{% endif %}">
+                            <i class="fa-solid fa-heart-pulse"></i> Heart Patients
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('doctor.medical_records_view') }}" class="nav-link {% if 'records' in request.path %}active{% endif %}">
+                            <i class="fa-solid fa-notes-medical"></i> Medical Records
+                        </a>
+                    </li>
+                    <!-- Security Dropdown -->
+                    <li class="nav-dropdown">
+                        <a href="javascript:void(0)" class="nav-link {% if 'security' in request.path or 'decoy' in request.path %}active{% endif %}">
+                            <i class="fa-solid fa-shield-halved"></i> Security <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; margin-left: 2px;"></i>
+                        </a>
+                        <div class="dropdown-menu">
+                            <a href="{{ url_for('admin.dashboard') }}" class="dropdown-item">
+                                <i class="fa-solid fa-chart-line"></i> SOC Dashboard
+                            </a>
+                            <a href="{{ url_for('security.alerts') }}" class="dropdown-item">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Security Incident Alerts
+                            </a>
+                            <a href="{{ url_for('security.threat_monitor') }}" class="dropdown-item">
+                                <i class="fa-solid fa-satellite-dish"></i> Threat Telemetry &amp; IDS
+                            </a>
+                            <a href="{{ url_for('decoy.decoy_catalog') }}" class="dropdown-item">
+                                <i class="fa-solid fa-masks-theater"></i> Decoy Sandbox &amp; Canaries
+                            </a>
+                            <a href="{{ url_for('security.audit_logs') }}" class="dropdown-item">
+                                <i class="fa-solid fa-file-shield"></i> Tamper-Evident Audit Logs
+                            </a>
+                            <a href="{{ url_for('security.device_security') }}" class="dropdown-item">
+                                <i class="fa-solid fa-laptop-medical"></i> Hardware Device Security
+                            </a>
+                            <a href="{{ url_for('security.risk_analysis') }}" class="dropdown-item">
+                                <i class="fa-solid fa-bolt"></i> Cyber Attack Simulator
+                            </a>
+                            <a href="{{ url_for('doctor.confidential_records_view') }}" class="dropdown-item">
+                                <i class="fa-solid fa-vault"></i> Confidential Records Vault
+                            </a>
+                            <a href="{{ url_for('doctor.emergency_access') }}" class="dropdown-item">
+                                <i class="fa-solid fa-kit-medical"></i> Emergency Break-Glass Access
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('home') }}#about" class="nav-link">
+                            <i class="fa-solid fa-circle-info"></i> About
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Right Side Controls -->
+            <div class="navbar-actions">
+                <!-- Device Status Pill -->
+                <div class="device-badge-pill" title="Zero-Trust Hardware Binding">
+                    <i class="fa-solid fa-laptop"></i>
+                    <span>{{ session_device_id }}</span>
+                </div>
+
+                <!-- Defense Status -->
+                <div class="defense-badge-pill">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>{{ system_threat_level }}</span>
+                </div>
+
+                <!-- Notifications -->
+                <a href="{{ url_for('security.alerts') }}" class="notification-bell-btn" title="View Security Incident Alerts">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="notification-counter">3</span>
+                </a>
+
+                <!-- User Profile or Login CTA -->
+                {% if current_user %}
+                <div class="nav-dropdown">
+                    <div class="nav-user-profile">
+                        <img src="{% if current_doctor %}{{ doctor_photo(current_doctor.profile_photo) }}{% elif current_patient %}{{ patient_photo(current_patient.profile_photo, False) }}{% else %}{{ doctor_photo(None) }}{% endif %}" alt="{{ current_user.name }}" class="nav-user-avatar">
+                        <div class="nav-user-info">
+                            <span class="nav-user-name">{{ current_user.name }}</span>
+                            <span class="nav-user-role">{{ current_user.role | capitalize }}</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down" style="font-size: 0.65rem; color: var(--text-muted); margin-left: 4px;"></i>
+                    </div>
+                    <div class="dropdown-menu" style="right: 0; left: auto;">
+                        <div style="padding: 10px 18px; border-bottom: 1px solid var(--border-light); font-size: 0.8rem; color: var(--text-muted);">
+                            Signed in as: <strong style="color: var(--navy-primary);">{{ current_user.username }}</strong>
+                        </div>
+                        <a href="{{ url_for('auth.profile') }}" class="dropdown-item">
+                            <i class="fa-solid fa-id-card"></i> {% if current_user.role == 'patient' %}My Patient Health Profile{% else %}Security Clearance Profile{% endif %}
+                        </a>
+                        {% if current_user.role == 'admin' %}
+                        <a href="{{ url_for('admin.manage_assignments') }}" class="dropdown-item">
+                            <i class="fa-solid fa-clipboard-user"></i> Doctor-Patient Assignments
+                        </a>
+                        <a href="{{ url_for('admin.manage_patients') }}" class="dropdown-item">
+                            <i class="fa-solid fa-heart-pulse"></i> Patient Management
+                        </a>
+                        {% endif %}
+                        <a href="{{ url_for('auth.logout') }}" class="dropdown-item" style="color: var(--red-critical);">
+                            <i class="fa-solid fa-arrow-right-from-bracket" style="color: var(--red-critical);"></i> Secure Logout
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <a href="{{ url_for('auth.create_profile_hub') }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;" title="Create Doctor or Patient Profile">
+                        <i class="fa-solid fa-user-plus"></i> Create Profile
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-lock"></i> Secure Login
+                    </a>
+                </div>
+                {% endif %}
+
+                <!-- Mobile Toggle -->
+                <button class="mobile-toggle" onclick="toggleMobileNav()" aria-label="Toggle navigation menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div id="mobileDrawer" style="display: none; background: #ffffff; border-top: 1px solid var(--border-light); padding: 16px 24px;">
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px;">
+                <li><a href="{{ url_for('home') }}" class="nav-link"><i class="fa-solid fa-house-medical"></i> Home</a></li>
+                <li><a href="{% if session.get('role') == 'admin' %}{{ url_for('admin.dashboard') }}{% elif session.get('role') == 'doctor' %}{{ url_for('doctor.dashboard') }}{% else %}{{ url_for('auth.login') }}{% endif %}" class="nav-link"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="{% if session.get('role') == 'admin' %}{{ url_for('admin.manage_users') }}{% else %}{{ url_for('home') }}#doctors{% endif %}" class="nav-link"><i class="fa-solid fa-user-doctor"></i> Doctors</a></li>
+                <li><a href="{{ url_for('patients.patient_list') }}" class="nav-link"><i class="fa-solid fa-heart-pulse"></i> Heart Patients</a></li>
+                <li><a href="{{ url_for('doctor.medical_records_view') }}" class="nav-link"><i class="fa-solid fa-notes-medical"></i> Medical Records</a></li>
+                <li><a href="{{ url_for('security.alerts') }}" class="nav-link"><i class="fa-solid fa-shield-halved"></i> Security Center</a></li>
+                <li><a href="{{ url_for('home') }}#about" class="nav-link"><i class="fa-solid fa-circle-info"></i> About</a></li>
+                {% if current_user %}
+                <li><a href="{{ url_for('auth.logout') }}" class="nav-link" style="color: var(--red-critical);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </header>
+
+    <!-- FLASH MESSAGES -->
+    <div class="container" style="padding-top: 16px; padding-bottom: 0;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" style="background: {% if category == 'danger' %}#fef2f2; border: 1px solid #fecaca; color: #b91c1c;{% elif category == 'success' %}#ecfdf5; border: 1px solid #a7f3d0; color: #047857;{% else %}#eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8;{% endif %} border-radius: 8px; padding: 12px 18px; margin-bottom: 16px; font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fa-solid {% if category == 'danger' %}fa-triangle-exclamation{% elif category == 'success' %}fa-circle-check{% else %}fa-circle-info{% endif %}"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                        <button type="button" onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; color: inherit; opacity: 0.7;">✕</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- MAIN BODY CONTENT -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ====================================================================
+         HOSPITAL FOOTER (DARK NAVY BLUE WITH TURQUOISE ACCENTS)
+         ==================================================================== -->
+    <footer class="hospital-footer">
+        <div class="footer-container">
+            <!-- Academic Compliance Alert Banner -->
+            <div class="footer-academic-alert">
+                <i class="fa-solid fa-shield-halved" style="color: var(--turquoise-primary); font-size: 1.4rem; margin-top: 2px;"></i>
+                <div>
+                    <strong style="color: #ffffff; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem;">
+                        ACADEMIC CYBERSECURITY &amp; PRIVACY PROTECTION SYSTEM DISCLAIMER
+                    </strong>
+                    <div style="color: #cbd5e1; font-size: 0.82rem; margin-top: 4px; line-height: 1.5;">
+                        This platform is built strictly as an academic full-stack cybersecurity prototype. It contains <strong>exclusively synthetic demo data</strong>. No real patient data, Aadhaar numbers, or hospital records are stored. All cardiac ECG waveforms, diagnostic panels, and clinician profiles are simulated. Do not use for actual medical diagnosis.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Columns Grid -->
+            <div class="footer-grid">
+                <!-- Col 1: Brand & Emergency Contact -->
+                <div>
+                    <div class="footer-brand-title">
+                        <i class="fa-solid fa-shield-heart" style="color: var(--turquoise-primary);"></i>
+                        Heart<span>Secure</span>
+                    </div>
+                    <p class="footer-brand-desc">
+                        Cyber Security &amp; Privacy Protection System for Critical Heart Patient Records. Engineered with Zero-Trust access control, real-time threat telemetry, and automated honeypot deception.
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.84rem; color: #cbd5e1;">
+                        <div><i class="fa-solid fa-phone" style="color: var(--turquoise-primary); width: 18px;"></i> 24/7 Cardiology ICU: <strong>+1 (800) 555-HEART</strong></div>
+                        <div><i class="fa-solid fa-envelope" style="color: var(--turquoise-primary); width: 18px;"></i> SOC Hotline: <strong>soc@heartsecure.hospital</strong></div>
+                        <div><i class="fa-solid fa-location-dot" style="color: var(--turquoise-primary); width: 18px;"></i> Cardiac ICU Telemetry Network, Pav. 4</div>
+                    </div>
+                </div>
+
+                <!-- Col 2: Clinical Portals -->
+                <div>
+                    <h4 class="footer-heading">Clinical Care</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('home') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i> Hospital Home</a></li>
+                        <li><a href="{% if session.get('role') == 'doctor' %}{{ url_for('doctor.dashboard') }}{% else %}{{ url_for('auth.login') }}{% endif %}"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i> Clinical Cardiology Station</a></li>
+                        <li><a href="{{ url_for('patients.patient_list') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i> Critical Heart Patients</a></li>
+                        <li><a href="{{ url_for('doctor.medical_records_view') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i> Medical Records Archive</a></li>
+                        <li><a href="{{ url_for('doctor.confidential_records_view') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i> Confidential Vault</a></li>
+                        <li><a href="{{ url_for('doctor.emergency_access') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i> Emergency Break-Glass</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Cyber Defense Center -->
+                <div>
+                    <h4 class="footer-heading">Cyber Security</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('admin.dashboard') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i> Security Operations Center</a></li>
+                        <li><a href="{{ url_for('security.alerts') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i> Incident Alerts Feed</a></li>
+                        <li><a href="{{ url_for('security.threat_monitor') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i> Threat Telemetry &amp; IDS</a></li>
+                        <li><a href="{{ url_for('decoy.decoy_catalog') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i> Decoy Honeypot Sandbox</a></li>
+                        <li><a href="{{ url_for('security.audit_logs') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i> Tamper-Evident Audit Logs</a></li>
+                        <li><a href="{{ url_for('security.device_security') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i> Zero-Trust Device Binding</a></li>
+                        <li><a href="{{ url_for('security.risk_analysis') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i> Cyber Attack Simulator</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Standards & Security Architecture -->
+                <div>
+                    <h4 class="footer-heading">Defense Standards</h4>
+                    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.82rem; color: #94a3b8;">
+                        <div style="background: rgba(255,255,255,0.05); padding: 10px 12px; border-radius: 6px; border-left: 3px solid var(--turquoise-primary);">
+                            <strong style="color: #ffffff;">Zero-Trust RBAC 2.0</strong>
+                            <div style="margin-top: 2px;">Patient-specific authorizations with automated dynamic risk score bounds.</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 10px 12px; border-radius: 6px; border-left: 3px solid #10b981;">
+                            <strong style="color: #ffffff;">SHA-256 Audit Integrity</strong>
+                            <div style="margin-top: 2px;">Tamper-evident cryptographic sequencing on all patient chart reads.</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 10px 12px; border-radius: 6px; border-left: 3px solid #8b5cf6;">
+                            <strong style="color: #ffffff;">Deception Sandboxing</strong>
+                            <div style="margin-top: 2px;">Automated honeypot redirection for high-risk and unauthorized inquiries.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Copyright Bar -->
+            <div class="footer-bottom">
+                <div>
+                    &copy; 2026 <strong>HeartSecure Medical Cybersecurity System</strong>. All rights reserved.
+                </div>
+                <div style="display: flex; gap: 18px; font-size: 0.8rem;">
+                    <span>Security Status: <strong style="color: var(--green-normal);">Active Defense</strong></span>
+                    <span>Framework: <strong>HIPAA &amp; Zero-Trust EMR</strong></span>
+                    <span>Version: <strong>2.6.4-SEC</strong></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    function toggleMobileNav() {
+        const drawer = document.getElementById('mobileDrawer');
+        drawer.style.display = (drawer.style.display === 'none' || drawer.style.display === '') ? 'block' : 'none';
+    }
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

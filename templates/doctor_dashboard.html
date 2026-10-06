@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Clinical Cardiology Station | {{ user.name }} - {{ SYSTEM_NAME }}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 28px;">
+    <!-- Clinician Header & Dynamic Risk Assessment -->
+    <div class="card" style="padding: 22px; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <div style="display: flex; align-items: center; gap: 18px;">
+                <div style="position: relative;">
+                    <img src="{{ doctor_photo(doctor.profile_photo if doctor else None) }}" alt="{{ user.name }}" class="profile-card-avatar" style="width: 76px; height: 76px; border: 3px solid #0284c7;">
+                    <span class="badge badge-low" style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); font-size: 0.62rem; padding: 2px 6px; white-space: nowrap;">DOCTOR</span>
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <h1 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin: 0;">👨‍⚕️ Clinical Cardiology Station</h1>
+                        <span class="badge badge-low" style="font-size: 0.72rem;">ACTIVE CLINICIAN</span>
+                    </div>
+                    <div style="color: #0284c7; font-size: 0.9rem; font-weight: 600; margin-top: 3px;">
+                        Clinician: <strong>{{ user.name }}</strong> (Doctor ID: <code>{{ doctor.doctor_id if doctor else 'D001' }}</code> • {{ doctor.specialization if doctor and doctor.specialization else (doctor.specialty if doctor else 'Cardiologist') }})
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 0.8rem; margin-top: 3px;">
+                        <span>🎓 {{ doctor.qualification if doctor and doctor.qualification else 'MBBS, MD Cardiology' }}</span>
+                        <span style="margin: 0 6px;">•</span>
+                        <span>⏳ Exp: {{ doctor.experience if doctor and doctor.experience else '8+ Years' }}</span>
+                        <span style="margin: 0 6px;">•</span>
+                        <span>🏥 {{ doctor.department if doctor else 'Cardiology' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Session Risk Assessment Card -->
+            <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: 8px; padding: 12px 20px; display: flex; align-items: center; gap: 18px;">
+                <div>
+                    <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">
+                        Active Session Risk Score
+                    </div>
+                    <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 2px;">
+                        <span style="font-size: 1.5rem; font-weight: 800; font-family: var(--font-mono); color: {% if risk.score > 60 %}#dc2626{% elif risk.score > 30 %}#d97706{% else %}#059669{% endif %};">
+                            {{ risk.score }} / 100
+                        </span>
+                        <span class="badge {% if risk.level == 'CRITICAL' %}badge-critical{% elif risk.level == 'HIGH' %}badge-high{% elif risk.level == 'MEDIUM' %}badge-medium{% else %}badge-low{% endif %}">
+                            {{ risk.level }} RISK
+                        </span>
+                    </div>
+                </div>
+                <div style="border-left: 1px solid var(--border-light); padding-left: 16px; font-size: 0.78rem; color: var(--text-secondary);">
+                    Terminal: <strong style="color: var(--text-main);">{{ session.device_id or 'DEV-DOC01-TRUSTED' }}</strong><br>
+                    Status: {% if session.device_status == 'TRUSTED' %}<span style="color: #059669; font-weight: 600;">TRUSTED (-5)</span>{% else %}<span style="color: #dc2626; font-weight: 600;">UNKNOWN (+20)</span>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation & Stats Cards -->
+    <div class="stats-grid" style="margin-bottom: 24px;">
+        <a href="{{ url_for('patients.patient_list') }}" style="text-decoration: none;">
+            <div class="stat-card" style="border-left-color: var(--primary-blue); cursor: pointer;">
+                <div class="stat-header">
+                    <span class="stat-label">ASSIGNED PATIENTS</span>
+                    <span class="stat-icon-bubble" style="background: var(--primary-blue-light); color: var(--primary-blue);">🫀</span>
+                </div>
+                <div class="stat-value" style="color: var(--primary-blue);">{{ patient_count }}</div>
+                <div class="stat-sub">Authorized critical cardiac roster →</div>
+            </div>
+        </a>
+
+        <a href="{{ url_for('doctor.medical_records_view') }}" style="text-decoration: none;">
+            <div class="stat-card" style="border-left-color: #0ea5e9; cursor: pointer;">
+                <div class="stat-header">
+                    <span class="stat-label">MEDICAL RECORDS</span>
+                    <span class="stat-icon-bubble" style="background: #e0f2fe; color: #0284c7;">📝</span>
+                </div>
+                <div class="stat-value" style="color: #0284c7;">{{ medical_records | length }}</div>
+                <div class="stat-sub">Clinical notes &amp; ECG archive →</div>
+            </div>
+        </a>
+
+        <a href="{{ url_for('doctor.confidential_records_view') }}" style="text-decoration: none;">
+            <div class="stat-card" style="border-left-color: #7c3aed; cursor: pointer;">
+                <div class="stat-header">
+                    <span class="stat-label">CONFIDENTIAL DOSSIERS</span>
+                    <span class="stat-icon-bubble" style="background: #f5f3ff; color: #7c3aed;">🔒</span>
+                </div>
+                <div class="stat-value" style="color: #7c3aed;">
+                    {% if doctor and doctor.permission_level == 'HIGHLY_CONFIDENTIAL' %}
+                        Level 3 Full
+                    {% elif doctor and doctor.permission_level == 'CONFIDENTIAL' %}
+                        Level 2 Granted
+                    {% else %}
+                        Level 1 Standard
+                    {% endif %}
+                </div>
+                <div class="stat-sub">3-Tier Sensitivity Vault →</div>
+            </div>
+        </a>
+
+        <a href="{{ url_for('doctor.emergency_access') }}" style="text-decoration: none;">
+            <div class="stat-card" style="border-left-color: #ef4444; cursor: pointer;">
+                <div class="stat-header">
+                    <span class="stat-label">EMERGENCY BREAK-GLASS</span>
+                    <span class="stat-icon-bubble" style="background: #fee2e2; color: #dc2626;">🚨</span>
+                </div>
+                <div class="stat-value" style="color: #dc2626;">
+                    {{ active_emergencies | length }} Active
+                </div>
+                <div class="stat-sub">15-min emergency clinical override →</div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Authorized Patient Roster Table -->
+    <div class="card" style="margin-bottom: 24px;">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">🫀 My Authorized Critical Heart Patients</h2>
+                <p class="card-subtitle">
+                    Strictly authorized patient records for Doctor ID <code>{{ doctor.doctor_id if doctor else 'D001' }}</code>. Probing unassigned patients increases cyber risk and triggers honeypot diversion.
+                </p>
+            </div>
+            <form action="{{ url_for('patients.patient_list') }}" method="GET" style="display: flex; gap: 8px;">
+                <input type="text" name="q" class="form-control" placeholder="Search assigned patients..." style="width: 220px; padding: 6px 12px; font-size: 0.82rem;">
+                <button type="submit" class="btn btn-secondary btn-sm">Search</button>
+            </form>
+        </div>
+
+        {% if patients %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Patient ID</th>
+                        <th>Age / Sex</th>
+                        <th>Blood Group</th>
+                        <th>Heart Condition Category</th>
+                        <th>Sensitivity Level</th>
+                        <th>Current Vitals</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in patients %}
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <img src="{{ patient_photo(p.profile_photo, False) }}" alt="{{ p.name }}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #ef4444; flex-shrink: 0; background: #fee2e2;">
+                                <div>
+                                    <div style="font-weight: 600; color: var(--text-main);">{{ p.name }}</div>
+                                    <span class="badge badge-medium" style="font-size: 0.60rem; padding: 1px 5px; background: #fee2e2; color: #991b1b; border-color: #fca5a5;">PATIENT – DEMO</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span style="font-family: var(--font-mono); font-weight: 700; color: #0284c7;">
+                                {{ p.patient_id }}
+                            </span>
+                        </td>
+                        <td style="color: var(--text-secondary);">
+                            <div>{{ p.age }} yrs / {{ p.gender }}</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px;">
+                                <i class="fa-solid fa-phone" style="font-size: 0.68rem; color: var(--turquoise-primary);"></i> {{ p.phone_number or '+1 (555) 019-1001' }}
+                            </div>
+                        </td>
+                        <td><span class="badge badge-low">{{ p.blood_group }}</span></td>
+                        <td>
+                            <span class="badge" style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;">
+                                {{ p.heart_condition_category }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if p.record_sensitivity_level == 'HIGHLY_CONFIDENTIAL' %}
+                                <span class="badge badge-critical">HIGHLY CONFIDENTIAL</span>
+                            {% elif p.record_sensitivity_level == 'CONFIDENTIAL' %}
+                                <span class="badge badge-medium">CONFIDENTIAL</span>
+                            {% else %}
+                                <span class="badge badge-low">NORMAL</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% set v = format_vitals(p.vitals) %}
+                            <span style="font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600; color: var(--navy-primary); display: inline-flex; align-items: center; gap: 4px;">
+                                <i class="fa-solid fa-heart-pulse" style="color: #ef4444; font-size: 0.72rem;"></i> {{ v.summary }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('patients.patient_detail', patient_id=p.patient_id) }}" class="btn btn-primary btn-sm">
+                                View Protected Chart →
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+            <div style="font-size: 2rem; margin-bottom: 8px;">🏥</div>
+            <p>No critical heart patients currently assigned to your doctor profile.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- TWO-COLUMN SECTION: RECENT CLINICAL ACTIVITY & ACTIVE SECURITY NOTIFICATIONS -->
+    <div class="grid-2">
+        <!-- RECENT ACTIVITY -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">📜 Recent Clinical Activity Audit</h3>
+                <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Tamper-Evident Trail</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                {% for act in recent_activity %}
+                <div style="padding: 10px 14px; background: #f8fafc; border-radius: 6px; border: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">
+                            {{ act.action }}
+                            {% if act.patient_id %}<span style="color: #0284c7; font-family: var(--font-mono);">({{ act.patient_id }})</span>{% endif %}
+                        </div>
+                        <div style="font-size: 0.74rem; color: var(--text-muted);">{{ act.timestamp }} • Risk: {{ act.risk_score }}/100</div>
+                    </div>
+                    <div>
+                        {% if act.result == 'SUCCESS' %}
+                            <span class="badge badge-low" style="font-size: 0.7rem;">SUCCESS</span>
+                        {% elif act.result == 'DECOY_SERVED' %}
+                            <span class="badge badge-critical" style="font-size: 0.7rem;">DECOY SERVED</span>
+                        {% else %}
+                            <span class="badge badge-medium" style="font-size: 0.7rem;">{{ act.result }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div style="color: var(--text-muted); font-size: 0.85rem; padding: 10px;">No recent clinical actions recorded.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- SECURITY GOVERNANCE & PROTOCOLS -->
+        <div class="card" style="border: 1px solid #bfdbfe; background: #f0f9ff;">
+            <div class="card-header" style="border-bottom-color: #bfdbfe;">
+                <h3 class="card-title" style="color: #0369a1;">🛡️ Clinical Security Governance &amp; Protocols</h3>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <span style="color: #059669; font-size: 1.1rem; font-weight: 700;">✓</span>
+                    <div>
+                        <strong style="color: var(--text-main);">Patient-Specific Roster Isolation</strong>: Access is strictly bounded by clinical assignments. Attempting to open charts of patients assigned to other clinicians triggers automated privilege breach logging.
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <span style="color: #0284c7; font-size: 1.1rem; font-weight: 700;">✓</span>
+                    <div>
+                        <strong style="color: var(--text-main);">Multi-Factor Authentication Enforced</strong>: Every login session requires cryptographic token / simulated demo OTP authentication.
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <span style="color: #dc2626; font-size: 1.1rem; font-weight: 700;">⚠️</span>
+                    <div>
+                        <strong style="color: var(--text-main);">Emergency Break-Glass Protocol</strong>: In life-threatening cardiac emergencies, clinicians can request a 15-minute emergency override with clinical justification, subject to retroactive administrative audit.
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <span style="color: #7c3aed; font-size: 1.1rem; font-weight: 700;">🎭</span>
+                    <div>
+                        <strong style="color: var(--text-main);">Automated Honeypot Shunting</strong>: Any session displaying anomalous bulk queries or suspicious behavior is dynamically trapped in the Decoy Honeypot Sandbox.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

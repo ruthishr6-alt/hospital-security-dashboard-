@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Security Incident Alerts | Critical Heart Patient Cyber Security System{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px;">
+    <!-- HEADER -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 20px;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--navy-primary); display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i> Real-Time Security Incident Alerts
+                </h1>
+                <span class="badge badge-critical" style="font-weight: 700;">{{ stats.unresolved_alerts }} Unresolved</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
+                Autonomous Threat Detection Feed &amp; Incident Disposition Console for Cardiac ICU
+            </p>
+        </div>
+
+        <!-- Severity & Status Filters -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <a href="{{ url_for('security.alerts') }}" class="btn btn-secondary btn-sm {% if not severity_filter and not status_filter %}btn-primary{% endif %}">All Alerts</a>
+            <a href="{{ url_for('security.alerts', severity='CRITICAL') }}" class="btn btn-secondary btn-sm {% if severity_filter == 'CRITICAL' %}btn-primary{% endif %}" style="color: #dc2626; font-weight: 600;">Critical</a>
+            <a href="{{ url_for('security.alerts', severity='HIGH') }}" class="btn btn-secondary btn-sm {% if severity_filter == 'HIGH' %}btn-primary{% endif %}" style="color: #ea580c; font-weight: 600;">High</a>
+            <a href="{{ url_for('security.alerts', status='NEW') }}" class="btn btn-secondary btn-sm {% if status_filter == 'NEW' %}btn-primary{% endif %}" style="color: #7c3aed; font-weight: 600;">New Only</a>
+            <a href="{{ url_for('security.alerts', status='RESOLVED') }}" class="btn btn-secondary btn-sm {% if status_filter == 'RESOLVED' %}btn-primary{% endif %}" style="color: #059669; font-weight: 600;">Resolved</a>
+        </div>
+    </div>
+
+    <!-- METRIC SUMMARY CARDS -->
+    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div class="card stat-card" style="border-left: 4px solid #0284c7; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div class="stat-label">TOTAL SECURITY ALERTS</div>
+            <div class="stat-value" style="color: var(--navy-primary);">{{ stats.total_alerts }}</div>
+            <div class="stat-sub">Aggregated incident logs</div>
+        </div>
+
+        <div class="card stat-card" style="border-left: 4px solid #ef4444; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div class="stat-label">CRITICAL THREATS</div>
+            <div class="stat-value" style="color: #dc2626;">{{ stats.critical_threats }}</div>
+            <div class="stat-sub">Score &gt; 80 / Honeypot engaged</div>
+        </div>
+
+        <div class="card stat-card" style="border-left: 4px solid #f97316; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div class="stat-label">HIGH SEVERITY ALERTS</div>
+            <div class="stat-value" style="color: #ea580c;">{{ stats.high_threats }}</div>
+            <div class="stat-sub">Privilege breaches / probes</div>
+        </div>
+
+        <div class="card stat-card" style="border-left: 4px solid #8b5cf6; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div class="stat-label">INSIDER THREAT DETECTIONS</div>
+            <div class="stat-value" style="color: #7c3aed;">{{ stats.insider_threats }}</div>
+            <div class="stat-sub">Bulk harvesting / rogue queries</div>
+        </div>
+    </div>
+
+    <!-- ALERTS TABLE -->
+    <div class="card" style="box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
+        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-radar" style="color: var(--navy-accent);"></i>
+                <h2 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-primary); margin: 0;">Active Threat Telemetry ({{ alerts | length }} Incidents)</h2>
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono); font-weight: 600;">Autonomous Deception Shield Active</span>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ALERT ID</th>
+                        <th>TIMESTAMP</th>
+                        <th>THREAT CLASSIFICATION</th>
+                        <th>SEVERITY</th>
+                        <th>TARGET / USER</th>
+                        <th>RISK SCORE</th>
+                        <th>FORENSIC DESCRIPTION</th>
+                        <th>INCIDENT STATUS</th>
+                        <th>DISPOSITION ACTION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in alerts %}
+                    <tr style="{% if a.status != 'RESOLVED' and a.severity == 'CRITICAL' %}background: #fff5f5;{% endif %}">
+                        <td style="font-family: var(--font-mono); font-weight: 700; color: #0284c7;">
+                            {{ a.alert_id }}
+                        </td>
+                        <td style="font-family: var(--font-mono); font-size: 0.76rem; color: var(--text-muted); white-space: nowrap;">
+                            {{ a.timestamp }}
+                        </td>
+                        <td>
+                            <strong style="color: var(--navy-primary); font-size: 0.88rem;">{{ a.threat_type }}</strong>
+                        </td>
+                        <td>
+                            {% if a.severity == 'CRITICAL' %}
+                                <span class="badge badge-critical" style="font-weight: 700;">● CRITICAL</span>
+                            {% elif a.severity == 'HIGH' %}
+                                <span class="badge badge-high" style="font-weight: 700;">● HIGH</span>
+                            {% elif a.severity == 'MEDIUM' %}
+                                <span class="badge badge-medium" style="font-weight: 700;">● MEDIUM</span>
+                            {% else %}
+                                <span class="badge badge-low" style="font-weight: 600;">● LOW</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="user-role-tag" style="font-family: var(--font-mono); font-weight: 600;">
+                                {{ a.user_id }}
+                            </span>
+                        </td>
+                        <td>
+                            <span style="font-family: var(--font-mono); font-weight: 800; font-size: 1rem; color: {% if a.risk_score > 60 %}#dc2626{% elif a.risk_score > 30 %}#d97706{% else %}#059669{% endif %};">
+                                {{ a.risk_score }} / 100
+                            </span>
+                        </td>
+                        <td style="font-size: 0.82rem; color: var(--navy-primary); max-width: 320px; line-height: 1.45;">
+                            {{ a.description }}
+                        </td>
+                        <td>
+                            {% if a.status == 'RESOLVED' %}
+                                <span class="badge badge-low" style="font-weight: 700;">✓ RESOLVED</span>
+                            {% elif a.status == 'INVESTIGATING' %}
+                                <span class="badge badge-medium" style="font-weight: 700;">🔍 INVESTIGATING</span>
+                            {% else %}
+                                <span class="badge badge-critical" style="font-weight: 700;">⚠️ NEW</span>
+                            {% endif %}
+                        </td>
+                        <td style="white-space: nowrap;">
+                            <form action="{{ url_for('security.update_alert', alert_id=a.alert_id) }}" method="POST" style="display: flex; gap: 6px;">
+                                {% if a.status != 'RESOLVED' %}
+                                    {% if a.status == 'NEW' %}
+                                    <input type="hidden" name="status" value="INVESTIGATING">
+                                    <button type="submit" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 4px 8px;" title="Mark Investigating">Investigate</button>
+                                    {% else %}
+                                    <input type="hidden" name="status" value="RESOLVED">
+                                    <button type="submit" class="btn btn-primary btn-sm" style="font-size: 0.75rem; padding: 4px 8px;" title="Resolve Incident">Resolve</button>
+                                    {% endif %}
+                                {% else %}
+                                    <input type="hidden" name="status" value="NEW">
+                                    <button type="submit" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 4px 8px;" title="Re-open Incident">Re-open</button>
+                                {% endif %}
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            No security incidents found matching your query filter.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

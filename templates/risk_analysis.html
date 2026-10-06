@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block title %}Risk-Based Access Control &amp; Scenario Simulator | {{ SYSTEM_NAME }}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 30px;">
+    <!-- HEADER -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 24px;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--navy-primary); display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-bolt" style="color: var(--navy-accent);"></i> Risk-Based Access Control &amp; Attack Simulator
+                </h1>
+                <span class="badge badge-low" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;">Engine Active</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
+                Dynamic 0–100 risk score formulation, zero-trust factor matrix, and 6 real-time attack simulation workflows.
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-chart-line"></i> SOC Dashboard
+            </a>
+            <a href="{{ url_for('decoy.decoy_monitor') }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-masks-theater"></i> Decoy Sandbox
+            </a>
+        </div>
+    </div>
+
+    <!-- 1. THE 4 RISK TIERS -->
+    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div class="card stat-card" style="border-left: 4px solid #10b981; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div class="stat-label">LOW RISK (0–30)</div>
+            <div class="stat-value" style="color: #059669; font-size: 1.25rem;">ALLOW REAL DATA</div>
+            <div class="stat-sub">Doctor + authorized patient + normal behavior</div>
+        </div>
+
+        <div class="card stat-card" style="border-left: 4px solid #f59e0b; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div class="stat-label">MEDIUM RISK (31–60)</div>
+            <div class="stat-value" style="color: #d97706; font-size: 1.25rem;">ALLOW + MONITOR</div>
+            <div class="stat-sub">Minor anomaly or unusual access hour</div>
+        </div>
+
+        <div class="card stat-card" style="border-left: 4px solid #f97316; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div class="stat-label">HIGH RISK (61–80)</div>
+            <div class="stat-value" style="color: #ea580c; font-size: 1.25rem;">BLOCK REAL DATA</div>
+            <div class="stat-sub">Cross-patient probe or repeated failed auth</div>
+        </div>
+
+        <div class="card stat-card" style="border-left: 4px solid #ef4444; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div class="stat-label">CRITICAL RISK (81–100)</div>
+            <div class="stat-value" style="color: #dc2626; font-size: 1.25rem;">DECOY HONEYPOT</div>
+            <div class="stat-sub">Real DB blocked • Decoy served • Alert sent</div>
+        </div>
+    </div>
+
+    <!-- 2. SCENARIO SIMULATION CENTER (ALL 6 SPECIFIED DEMO SCENARIOS) -->
+    <div class="card" style="margin-bottom: 28px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
+        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-vial-virus" style="color: var(--navy-accent);"></i>
+                <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--navy-primary); margin: 0;">6 Academic Demonstration Scenarios (1-Click Real-Time Testing)</h2>
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">Endpoint: <code>/api/security/simulate-scenario</code></span>
+        </div>
+        <div style="padding: 20px;">
+            <p style="font-size: 0.86rem; color: var(--text-muted); margin: 0 0 18px;">
+                Click any scenario to execute backend risk evaluation, tamper-evident audit logging, and automated defensive mitigation.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+                <!-- SCENARIO 1 -->
+                <div class="card" style="background: #f0fdf4; border: 1px solid #bbf7d0; box-shadow: none; padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #15803d; font-size: 0.95rem;">Scenario 1: Authorized Doctor</strong>
+                        <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">LOW (0–10)</span>
+                    </div>
+                    <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px; min-height: 48px; line-height: 1.45;">
+                        Dr. Lin (D001) accesses assigned patient HP001 from trusted workstation.
+                        <br><strong style="color: var(--navy-primary);">Expected:</strong> Real protected record served.
+                    </p>
+                    <button type="button" class="btn btn-primary btn-sm" style="width: 100%; font-weight: 700;" onclick="runSimulation('1')">
+                        ▶ Simulate Scenario 1
+                    </button>
+                </div>
+
+                <!-- SCENARIO 2 -->
+                <div class="card" style="background: #fff7ed; border: 1px solid #ffedd5; box-shadow: none; padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #c2410c; font-size: 0.95rem;">Scenario 2: Unauthorized Patient</strong>
+                        <span class="badge badge-high" style="background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; font-weight: 700;">PENALTY +20</span>
+                    </div>
+                    <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px; min-height: 48px; line-height: 1.45;">
+                        Dr. Lin (D001) attempts to view HP003 (assigned to Dr. Vance).
+                        <br><strong style="color: var(--navy-primary);">Expected:</strong> Protected chart denied &amp; breach logged.
+                    </p>
+                    <button type="button" class="btn btn-secondary btn-sm" style="width: 100%; border-color: #f97316; color: #ea580c; font-weight: 700;" onclick="runSimulation('2')">
+                        ▶ Simulate Scenario 2
+                    </button>
+                </div>
+
+                <!-- SCENARIO 3 -->
+                <div class="card" style="background: #fef2f2; border: 1px solid #fecaca; box-shadow: none; padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #b91c1c; font-size: 0.95rem;">Scenario 3: Repeated Failed Logins</strong>
+                        <span class="badge badge-critical" style="font-weight: 700;">CRITICAL (95)</span>
+                    </div>
+                    <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px; min-height: 48px; line-height: 1.45;">
+                        Attacker attempts 4 failed logins from unknown IP.
+                        <br><strong style="color: var(--navy-primary);">Expected:</strong> Session restricted &amp; SOC alert generated.
+                    </p>
+                    <button type="button" class="btn btn-secondary btn-sm" style="width: 100%; border-color: #ef4444; color: #dc2626; font-weight: 700;" onclick="runSimulation('3')">
+                        ▶ Simulate Scenario 3
+                    </button>
+                </div>
+
+                <!-- SCENARIO 4 -->
+                <div class="card" style="background: #faf5ff; border: 1px solid #e9d5ff; box-shadow: none; padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #7e22ce; font-size: 0.95rem;">Scenario 4: Suspicious User (Decoy)</strong>
+                        <span class="badge" style="background: #f3e8ff; color: #7c3aed; border: 1px solid #d8b4fe; font-weight: 700;">HONEYPOT DECEPTION</span>
+                    </div>
+                    <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px; min-height: 48px; line-height: 1.45;">
+                        Unknown host probes patient database.
+                        <br><strong style="color: var(--navy-primary);">Expected:</strong> Real data shielded • Decoy sandbox served.
+                    </p>
+                    <button type="button" class="btn btn-secondary btn-sm" style="width: 100%; border-color: #a855f7; color: #7c3aed; font-weight: 700;" onclick="runSimulation('4')">
+                        ▶ Simulate Scenario 4
+                    </button>
+                </div>
+
+                <!-- SCENARIO 5 -->
+                <div class="card" style="background: #fff1f2; border: 1px solid #fecdd3; box-shadow: none; padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #be123c; font-size: 0.95rem;">Scenario 5: Emergency Break-Glass</strong>
+                        <span class="badge" style="background: #ffe4e6; color: #e11d48; border: 1px solid #fecdd3; font-weight: 700;">15-MIN OVERRIDE</span>
+                    </div>
+                    <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px; min-height: 48px; line-height: 1.45;">
+                        Doctor enters clinical justification for unassigned emergency.
+                        <br><strong style="color: var(--navy-primary);">Expected:</strong> Temporary grant + risk logged (+15).
+                    </p>
+                    <button type="button" class="btn btn-secondary btn-sm" style="width: 100%; border-color: #e11d48; color: #be123c; font-weight: 700;" onclick="runSimulation('5')">
+                        ▶ Simulate Scenario 5
+                    </button>
+                </div>
+
+                <!-- SCENARIO 6 -->
+                <div class="card" style="background: #fdf4ff; border: 1px solid #f5d0fe; box-shadow: none; padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #86198f; font-size: 0.95rem;">Scenario 6: Insider Threat</strong>
+                        <span class="badge badge-critical" style="font-weight: 700;">BULK HARVEST</span>
+                    </div>
+                    <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px; min-height: 48px; line-height: 1.45;">
+                        Authenticated doctor executes anomalous bulk patient query.
+                        <br><strong style="color: var(--navy-primary);">Expected:</strong> Insider alert fired • Access restricted.
+                    </p>
+                    <button type="button" class="btn btn-secondary btn-sm" style="width: 100%; border-color: #c084fc; color: #86198f; font-weight: 700;" onclick="runSimulation('6')">
+                        ▶ Simulate Scenario 6
+                    </button>
+                </div>
+            </div>
+
+            <!-- SIMULATION LIVE EXECUTION OUTPUT BOX -->
+            <div id="simResultBox" style="display: none; margin-top: 24px; padding: 20px; border-radius: 10px; background: #f8fafc; border: 2px solid #0284c7; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px;">
+                    <h3 id="simTitle" style="color: #0284c7; font-size: 1.1rem; font-weight: 800; margin: 0;"></h3>
+                    <span id="simStatusBadge" class="badge" style="font-weight: 700;"></span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 14px; font-family: var(--font-mono); font-size: 0.88rem;">
+                    <div>Risk Score: <strong id="simRiskScore" style="font-size: 1.15rem;"></strong></div>
+                    <div>Risk Level: <strong id="simRiskLevel"></strong></div>
+                    <div>Response Mode: <strong id="simResponseMode" style="color: #0284c7;"></strong></div>
+                </div>
+                <div id="simSummary" style="font-size: 0.88rem; color: var(--navy-primary); background: #ffffff; padding: 14px; border-radius: 8px; border: 1px solid var(--border-light); line-height: 1.5;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. DETAILED RISK WEIGHT MATRIX -->
+    <div class="card" style="box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
+        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-calculator" style="color: var(--navy-accent);"></i>
+                <h2 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-primary); margin: 0;">Mathematical Risk Scoring Factors Matrix (Clamped 0–100)</h2>
+            </div>
+            <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">Deterministic Algorithm</span>
+        </div>
+        <div style="padding: 20px;">
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 16px;">
+                Every sensitive cardiac record access evaluates user credentials, hardware terminal binding, patient assignment, and query velocity against this calibration matrix:
+            </p>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>EVALUATED FACTOR</th>
+                            <th>SCORE IMPACT</th>
+                            <th>RATIONALE &amp; CLINICAL SIGNIFICANCE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong style="color: var(--navy-primary);">Authorized Doctor</strong></td>
+                            <td><span style="color: #059669; font-weight: 800; font-family: var(--font-mono);">-10 pts</span></td>
+                            <td>Verified medical practitioner credentials reduce baseline risk.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--navy-primary);">Assigned Patient</strong></td>
+                            <td><span style="color: #059669; font-weight: 800; font-family: var(--font-mono);">-10 pts</span></td>
+                            <td>Patient is explicitly assigned to this doctor on the clinical roster.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--navy-primary);">Trusted Hardware Device</strong></td>
+                            <td><span style="color: #059669; font-weight: 800; font-family: var(--font-mono);">-5 pts</span></td>
+                            <td>Session originates from a registered hospital ICU terminal (e.g. <code>DEV-DOC01-TRUSTED</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--navy-primary);">Unknown / Untrusted Device</strong></td>
+                            <td><span style="color: #dc2626; font-weight: 800; font-family: var(--font-mono);">+20 pts</span></td>
+                            <td>Access from an unrecognized laptop or external internet connection.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--navy-primary);">Unusual Access Hour</strong></td>
+                            <td><span style="color: #d97706; font-weight: 800; font-family: var(--font-mono);">+15 pts</span></td>
+                            <td>Queries between 23:00 and 05:00 outside scheduled shift rotations.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--navy-primary);">Repeated Failed Logins</strong></td>
+                            <td><span style="color: #dc2626; font-weight: 800; font-family: var(--font-mono);">+25 pts</span></td>
+                            <td>Failed credential attempts detected from this IP address in the last 15 minutes.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--navy-primary);">Unauthorized Patient Access</strong></td>
+                            <td><span style="color: #dc2626; font-weight: 800; font-family: var(--font-mono);">+20 pts</span></td>
+                            <td>Clinician attempting to inspect a patient assigned to a different doctor.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--navy-primary);">Bulk Record Harvesting</strong></td>
+                            <td><span style="color: #dc2626; font-weight: 800; font-family: var(--font-mono);">+30 pts</span></td>
+                            <td>Multiple patient charts requested in rapid succession (&gt; 5 per minute).</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--navy-primary);">Repeated Suspicious API Requests</strong></td>
+                            <td><span style="color: #dc2626; font-weight: 800; font-family: var(--font-mono);">+25 pts</span></td>
+                            <td>Malformed parameter probes or exploratory URL directory fuzzing.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--navy-primary);">Attempt to Access Admin Pages</strong></td>
+                            <td><span style="color: #dc2626; font-weight: 800; font-family: var(--font-mono);">+30 pts</span></td>
+                            <td>Non-administrative account probing SOC telemetry or privilege endpoints.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--navy-primary);">Emergency Break-Glass Access</strong></td>
+                            <td><span style="color: #ea580c; font-weight: 800; font-family: var(--font-mono);">+15 pts</span></td>
+                            <td>Legitimate clinical access allowed, with temporary risk elevation and SOC audit.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function runSimulation(scenarioId) {
+    const box = document.getElementById('simResultBox');
+    box.style.display = 'block';
+    document.getElementById('simTitle').innerText = 'Simulating scenario #' + scenarioId + '...';
+    document.getElementById('simSummary').innerText = 'Executing backend risk engine and honeypot orchestration...';
+
+    fetch('/api/security/simulate-scenario', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenario: scenarioId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            document.getElementById('simTitle').innerText = 'Simulation Error';
+            document.getElementById('simSummary').innerText = data.error || 'Execution failed';
+            return;
+        }
+
+        document.getElementById('simTitle').innerText = data.scenario_name;
+        document.getElementById('simRiskScore').innerText = data.risk.score + ' / 100';
+        document.getElementById('simRiskScore').style.color = data.risk.score > 60 ? '#dc2626' : (data.risk.score > 30 ? '#d97706' : '#059669');
+        document.getElementById('simRiskLevel').innerText = data.risk.level;
+        document.getElementById('simResponseMode').innerText = data.response_mode;
+        
+        const badge = document.getElementById('simStatusBadge');
+        badge.innerText = data.status;
+        badge.className = 'badge ' + (data.risk.score > 60 ? 'badge-critical' : (data.risk.score > 30 ? 'badge-medium' : 'badge-low'));
+
+        document.getElementById('simSummary').innerText = data.summary;
+    })
+    .catch(err => {
+        document.getElementById('simTitle').innerText = 'Network Error';
+        document.getElementById('simSummary').innerText = err.message;
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="58" fill="#2e1065" stroke="#c084fc" stroke-width="3"/>
+  <circle cx="60" cy="42" r="20" fill="#e9d5ff"/>
+  <path d="M42 36 Q60 18 78 36 Q70 26 60 26 Q50 26 42 36 Z" fill="#581c87"/>
+  <path d="M26 110 C26 80 40 70 50 68 L70 68 C80 70 94 80 94 110 Z" fill="#9333ea"/>
+  <circle cx="94" cy="26" r="14" fill="#a855f7"/>
+  <text x="94" y="31" font-size="14" text-anchor="middle" fill="#ffffff">🎭</text>
+</svg>

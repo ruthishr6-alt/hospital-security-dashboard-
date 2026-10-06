@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Honeypot Decoy Monitor - {{ SYSTEM_NAME }}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px;">
+    <!-- HEADER -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 24px;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--navy-primary); display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-masks-theater" style="color: #8b5cf6;"></i> Honeypot &amp; Decoy Deception Monitor
+                </h1>
+                <span class="badge badge-decoy" style="font-weight: 700;">Sandbox Isolated</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
+                Active Honeytoken Canaries, Attacker Traps &amp; Exfiltration Forensics
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <a href="{{ url_for('security.simulator') }}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-bolt"></i> Simulate Honeypot Trip
+            </a>
+            <a href="{{ url_for('security.audit_logs') }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-file-shield"></i> View Audit Trail
+            </a>
+        </div>
+    </div>
+
+    <!-- Honeypot Stats Cards -->
+    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div class="card stat-card" style="border-left: 4px solid #8b5cf6; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div class="stat-label">TRAPPED INTERACTIONS</div>
+            <div class="stat-value" style="color: #7c3aed;">{{ stats.total_interactions }}</div>
+            <div class="stat-sub">Interactions recorded in honeypot</div>
+        </div>
+
+        <div class="card stat-card" style="border-left: 4px solid #ef4444; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div class="stat-label">UNIQUE ATTACKER IPS</div>
+            <div class="stat-value" style="color: #dc2626;">{{ stats.unique_attacker_ips }}</div>
+            <div class="stat-sub">Distinct adversaries confined</div>
+        </div>
+
+        <div class="card stat-card" style="border-left: 4px solid #f59e0b; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div class="stat-label">TOP TARGET HONEYTOKEN</div>
+            <div class="stat-value" style="font-size: 1.3rem; color: #d97706;">{{ stats.top_attacked_canary }}</div>
+            <div class="stat-sub">Highest canary hit rate</div>
+        </div>
+
+        <div class="card stat-card" style="border-left: 4px solid #10b981; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div class="stat-label">REAL DATA LEAKAGE</div>
+            <div class="stat-value" style="color: #059669;">0.00%</div>
+            <div class="stat-sub">Zero real patient records exposed</div>
+        </div>
+    </div>
+
+    <!-- DEPLOYED HONEYTOKEN CANARY RECORDS -->
+    <div class="card" style="margin-bottom: 24px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
+        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-shield-virus" style="color: #8b5cf6;"></i>
+                <span class="card-title" style="font-size: 1.05rem; font-weight: 700; color: var(--navy-primary);">Deployed Honeytoken Canaries (Isolated `decoy_patients` Table)</span>
+            </div>
+            <span class="badge badge-decoy" style="font-weight: 700;">{{ decoys|length }} Active Canaries</span>
+        </div>
+        <div style="padding: 16px 20px 0;">
+            <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0 0 16px;">
+                These synthetic heart patients exist solely in the isolated <code>decoy_patients</code> database table. Any query, search, or access targeting these records trips an immediate CRITICAL security event.
+            </p>
+        </div>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Canary Patient ID</th>
+                        <th>Synthetic Canary Name</th>
+                        <th>Diagnosis Baited</th>
+                        <th>Canary Tripwire Signature</th>
+                        <th>Attraction Level</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in decoys %}
+                    <tr>
+                        <td><span class="badge badge-decoy" style="font-family: var(--font-mono); font-weight: 700;">{{ d.patient_id }}</span></td>
+                        <td><strong style="color: var(--navy-primary);">{{ d.name }}</strong></td>
+                        <td style="font-size: 0.84rem; color: var(--navy-primary);">{{ d.diagnosis }}</td>
+                        <td>
+                            <code style="font-family: var(--font-mono); font-size: 0.74rem; color: #7c3aed; background: #f3e8ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #d8b4fe;">
+                                {{ d.honeytoken_signature }}
+                            </code>
+                        </td>
+                        <td>
+                            {% if 'VIP' in d.name or 'GOLDEN' in d.honeytoken_signature %}
+                                <span class="badge badge-critical" style="font-weight: 700;">★ HIGH ATTRACTION</span>
+                            {% else %}
+                                <span class="badge badge-medium" style="font-weight: 700;">STANDARD CANARY</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('patient.patient_detail', patient_id=d.patient_id) }}" class="btn btn-secondary btn-sm" target="_blank" style="font-size: 0.76rem; padding: 3px 8px;">
+                                Inspect View ↗
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ATTACKER DECOY INTERACTION LOG -->
+    <div class="card" style="box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
+        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-satellite" style="color: var(--navy-accent);"></i>
+                <span class="card-title" style="font-size: 1.05rem; font-weight: 700; color: var(--navy-primary);">Captured Adversary Honeypot Telemetry Stream</span>
+            </div>
+            <span class="badge badge-critical" style="font-weight: 700;">Attacker Forensics</span>
+        </div>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Session ID</th>
+                        <th>Attacker IP / UA</th>
+                        <th>Targeted Decoy</th>
+                        <th>Action Captured</th>
+                        <th>Query / Payload Dumps</th>
+                        <th>Tripped Honeytoken</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in sessions %}
+                    <tr>
+                        <td style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--text-muted); white-space: nowrap;">
+                            {{ s.timestamp }}
+                        </td>
+                        <td style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--navy-primary); font-weight: 600;">
+                            {{ s.session_id }}
+                        </td>
+                        <td style="font-family: var(--font-mono); font-size: 0.74rem;">
+                            <strong style="color: var(--navy-primary);">{{ s.ip_address }}</strong><br>
+                            <span style="color: var(--text-muted); font-size: 0.7rem;">{{ s.user_agent }}</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-decoy" style="font-family: var(--font-mono); font-weight: 700;">{{ s.decoy_patient_id }}</span>
+                        </td>
+                        <td>
+                            <strong style="color: var(--navy-primary); font-size: 0.84rem;">{{ s.action_performed }}</strong><br>
+                            <span style="font-size: 0.74rem; color: var(--text-muted);">{{ s.attacker_behavior }}</span>
+                        </td>
+                        <td style="font-family: var(--font-mono); font-size: 0.74rem; color: #0284c7; max-width: 220px; overflow-wrap: break-word;">
+                            {{ s.query_params or s.payload or 'N/A' }}
+                        </td>
+                        <td style="font-family: var(--font-mono); font-size: 0.74rem; color: #dc2626; font-weight: 700;">
+                            {{ s.honeytoken_tripped }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

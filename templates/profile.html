@@ -1,0 +1,1044 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if patient %}Patient Health Profile | {{ patient.name }} | HeartSecure
+{% elif doctor %}Clinician Profile | Dr. {{ doctor.name }} | HeartSecure
+{% else %}Security Clearance Profile | HeartSecure{% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- ====================================================================
+     CASE 1: PATIENT PROFILE VIEW
+     ==================================================================== -->
+{% if patient %}
+<div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+    <div>
+        <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--navy-primary); display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-heart-pulse" style="color: var(--turquoise-primary);"></i> Patient Health Profile &amp; Privacy Shield
+        </h1>
+        <p style="color: var(--text-muted); margin-top: 4px; font-size: 0.95rem;">
+            Verified personal patient identity, cardiac health records, and zero-trust privacy status.
+        </p>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <a href="{{ url_for('patients.patient_detail', patient_id=patient.patient_id) }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-notes-medical" style="color: var(--turquoise-primary);"></i> View My Medical Chart
+        </a>
+        <button type="button" class="btn btn-primary btn-sm" onclick="openPatientEditModal()" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-user-pen"></i> Edit Profile
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="openPatientPhotoModal()" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-camera"></i> Upload Photo
+        </button>
+        {% if patient.profile_photo %}
+        <form action="{{ url_for('auth.remove_own_photo') }}" method="POST" style="display: inline;" onsubmit="return confirm('Remove custom profile photo and restore default avatar?');">
+            <button type="submit" class="btn btn-secondary btn-sm" style="color: #dc2626; border-color: #fecaca; display: inline-flex; align-items: center; gap: 5px;">
+                <i class="fa-solid fa-trash-can"></i> Remove Photo
+            </button>
+        </form>
+        {% endif %}
+        <span class="badge badge-low" style="font-size: 0.82rem; padding: 6px 14px; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">
+            <i class="fa-solid fa-circle" style="font-size: 0.6rem; margin-right: 6px; color: #10b981;"></i> STATUS: ACTIVE SESSION
+        </span>
+    </div>
+</div>
+
+<div class="grid-2" style="gap: 24px; margin-bottom: 24px;">
+    <!-- LEFT CARD: PATIENT DEMOGRAPHICS & CLINICAL IDENTITY -->
+    <div class="card" style="box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
+        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-id-card" style="color: var(--turquoise-primary);"></i>
+                <h2 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-primary); margin: 0;">Identity &amp; Demographic Profile</h2>
+            </div>
+            <span class="user-role-tag" style="background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; font-weight: 700;">PATIENT</span>
+        </div>
+
+        <div style="padding: 20px;">
+            <!-- PROFILE PHOTO COMPONENT -->
+            <div style="display: flex; align-items: center; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-light); flex-wrap: wrap;">
+                <div style="position: relative; width: 96px; height: 96px; flex-shrink: 0;">
+                    <img src="{{ patient_photo(patient.profile_photo) }}" alt="{{ patient.name }}"
+                         style="width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 3px solid var(--turquoise-primary); background: #f8fafc; box-shadow: 0 4px 12px rgba(0, 168, 204, 0.2);">
+                    <span style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); font-size: 0.65rem; padding: 2px 8px; border-radius: 9999px; background: var(--turquoise-primary); color: #fff; font-weight: 700; letter-spacing: 0.05em; white-space: nowrap;">
+                        PATIENT
+                    </span>
+                </div>
+
+                <div style="flex: 1; min-width: 200px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                        <h3 style="font-size: 1.4rem; font-weight: 800; color: var(--navy-primary); margin: 0;">{{ patient.name }}</h3>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="openPatientPhotoModal()" style="font-size: 0.75rem; padding: 3px 8px;">
+                            <i class="fa-solid fa-camera"></i> Change Photo
+                        </button>
+                    </div>
+                    <div style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">
+                        Patient ID: <span style="font-family: var(--font-mono); color: var(--turquoise-primary); font-weight: 700;">{{ patient.patient_id }}</span>
+                        • User ID: <span style="font-family: var(--font-mono); color: #64748b; font-weight: 600;">{{ user.user_id }}</span>
+                    </div>
+                    <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 3px;">
+                        Username: <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0f172a;">{{ user.username }}</code>
+                        • {{ patient.email or user.email }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- DEMOGRAPHIC DETAILS LIST -->
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 18px;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-venus-mars" style="width: 18px; color: var(--turquoise-primary);"></i> Age &amp; Gender:</span>
+                    <strong style="color: var(--navy-primary); font-size: 0.9rem;">{{ patient.age }} Years • {{ patient.gender }}</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-droplet" style="width: 18px; color: #dc2626;"></i> Blood Group:</span>
+                    <span class="badge" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-weight: 700;">
+                        <i class="fa-solid fa-droplet" style="margin-right: 4px;"></i> {{ patient.blood_group }}
+                    </span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-phone" style="width: 18px; color: var(--turquoise-primary);"></i> Contact Phone:</span>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="badge" style="background: #f0fdfa; color: #0f766e; border: 1px solid #99f6e4; font-size: 0.72rem; font-weight: 700;">Verified</span>
+                        <span style="font-family: var(--font-mono); color: var(--navy-primary); font-weight: 700;">{{ patient.phone_number }}</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-envelope" style="width: 18px; color: var(--turquoise-primary);"></i> Contact Email:</span>
+                    <span style="color: var(--navy-primary); font-size: 0.9rem; font-weight: 600;">{{ patient.email or user.email }}</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-phone-volume" style="width: 18px; color: #dc2626;"></i> Emergency Contact:</span>
+                    <span style="color: var(--navy-primary); font-size: 0.9rem; font-weight: 700;">{{ patient.emergency_contact or 'Not Provided' }}</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-heart-circle-bolt" style="width: 18px; color: #dc2626;"></i> Heart Condition:</span>
+                    <span class="badge badge-critical" style="font-weight: 700;">
+                        {{ patient.heart_condition_category }}
+                    </span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-user-doctor" style="width: 18px; color: var(--turquoise-primary);"></i> Attending Cardiologist:</span>
+                    <strong style="color: var(--navy-primary); font-size: 0.9rem;">
+                        {{ patient.assigned_doctor_name or patient.assigned_doctor_id or 'Dr. Arjun Kumar (DOC001)' }}
+                    </strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-shield-halved" style="width: 18px; color: var(--turquoise-primary);"></i> Sensitivity Level:</span>
+                    <span class="badge badge-low" style="font-weight: 700;">{{ patient.record_sensitivity_level or 'NORMAL' }}</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-clock-rotate-left" style="width: 18px; color: var(--turquoise-primary);"></i> Last Updated:</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-muted);">{{ patient.last_updated or 'Active Record' }}</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; padding-top: 4px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-circle-check" style="width: 18px; color: #10b981;"></i> Account Status:</span>
+                    <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">ACTIVE</span>
+                </div>
+
+                <!-- MEDICAL HISTORY SUMMARY BOX -->
+                <div style="margin-top: 8px; background: #f8fafc; border: 1px solid var(--border-light); border-radius: 8px; padding: 12px;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--navy-primary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em;">
+                        <i class="fa-solid fa-file-medical" style="color: var(--turquoise-primary); margin-right: 4px;"></i> Medical History Summary
+                    </div>
+                    <div style="font-size: 0.85rem; color: #334155; line-height: 1.5;">
+                        {{ patient.medical_history }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT CARD: ZERO-TRUST PRIVACY SHIELD & TELEMETRY -->
+    <div class="card" style="box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
+        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-shield-halved" style="color: var(--turquoise-primary);"></i>
+                <h2 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-primary); margin: 0;">Zero-Trust Privacy &amp; Security Shield</h2>
+            </div>
+            <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">ZERO-TRUST ACTIVE</span>
+        </div>
+
+        <div style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Personal Access Scope:</span>
+                <span class="badge badge-low" style="font-weight: 700;">
+                    <i class="fa-solid fa-lock" style="margin-right: 4px;"></i> Strictly Self-Record Only ({{ patient.patient_id }})
+                </span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Cross-Record Protection:</span>
+                <span style="color: #059669; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 4px;">
+                    <i class="fa-solid fa-shield-virus"></i> Active (Intruders Diverted to Decoy)
+                </span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Hardware Terminal:</span>
+                <span style="font-family: var(--font-mono); font-weight: 600; color: var(--turquoise-primary);">{{ session.device_id or 'DEV-PATIENT-PORTAL' }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Hardware Trust Status:</span>
+                {% if session.device_status == 'TRUSTED' %}
+                    <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">
+                        <i class="fa-solid fa-check" style="margin-right: 4px;"></i> TRUSTED HARDWARE (-5 pts)
+                    </span>
+                {% else %}
+                    <span class="badge badge-critical" style="background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; font-weight: 700;">
+                        <i class="fa-solid fa-triangle-exclamation" style="margin-right: 4px;"></i> UNKNOWN TERMINAL (+20 pts)
+                    </span>
+                {% endif %}
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Active Session Token:</span>
+                <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #64748b; background: #f8fafc; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-light);">{{ session.session_id or 'SESS-ACTIVE' }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Identity Authentication:</span>
+                <span style="color: #059669; font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; gap: 4px;">
+                    <i class="fa-solid fa-circle-check"></i> Verified (Patient Portal Token)
+                </span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Dynamic Risk Score:</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-family: var(--font-mono); font-weight: 800; font-size: 1.15rem; color: {% if session.risk_score|default(10) > 60 %}#dc2626{% elif session.risk_score|default(10) > 30 %}#d97706{% else %}#059669{% endif %};">
+                        {{ session.risk_score|default(10) }} / 100
+                    </span>
+                    <span class="badge {% if session.risk_level|default('LOW') == 'CRITICAL' %}badge-critical{% elif session.risk_level|default('LOW') == 'HIGH' %}badge-high{% elif session.risk_level|default('LOW') == 'MEDIUM' %}badge-medium{% else %}badge-low{% endif %}">
+                        {{ session.risk_level|default('LOW') }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- CLINICAL ACCESS CALLOUT BANNER -->
+            <div style="margin-top: 10px; background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 10px; padding: 16px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <i class="fa-solid fa-chart-line" style="color: var(--turquoise-primary); font-size: 1.2rem;"></i>
+                    <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--navy-primary);">Access Your Full Medical Record</h4>
+                </div>
+                <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0 0 12px 0; line-height: 1.45;">
+                    View live synthetic telemetry, ECG rhythm traces, echocardiogram reports, blood test results, and current prescriptions in your secure medical chart.
+                </p>
+                <a href="{{ url_for('patients.patient_detail', patient_id=patient.patient_id) }}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-notes-medical"></i> View My Clinical Chart &amp; ECG
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ====================================================================
+     CASE 2: DOCTOR PROFILE VIEW
+     ==================================================================== -->
+{% elif doctor %}
+<div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+    <div>
+        <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--navy-primary); display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-id-card-clip" style="color: var(--turquoise-primary);"></i> Clinician Profile &amp; Security Clearance
+        </h1>
+        <p style="color: var(--text-muted); margin-top: 4px; font-size: 0.95rem;">
+            Verified clinician identity credentials, professional contact, and RBAC security authorization.
+        </p>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <a href="{{ url_for('doctor.dashboard') }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-chart-line"></i> Clinician Dashboard
+        </a>
+        <button type="button" class="btn btn-primary btn-sm" onclick="openDoctorEditModal()" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-user-pen"></i> Edit Profile
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="openPhotoUploadModal()" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-camera"></i> Upload Photo
+        </button>
+        {% if doctor.profile_photo %}
+        <form action="{{ url_for('auth.remove_own_photo') }}" method="POST" style="display: inline;" onsubmit="return confirm('Remove custom profile photo and restore default avatar?');">
+            <button type="submit" class="btn btn-secondary btn-sm" style="color: #dc2626; border-color: #fecaca; display: inline-flex; align-items: center; gap: 5px;">
+                <i class="fa-solid fa-trash-can"></i> Remove Photo
+            </button>
+        </form>
+        {% endif %}
+        <span class="badge badge-low" style="font-size: 0.82rem; padding: 6px 14px; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">
+            <i class="fa-solid fa-circle" style="font-size: 0.6rem; margin-right: 6px; color: #10b981;"></i> STATUS: ACTIVE SESSION
+        </span>
+    </div>
+</div>
+
+<div class="grid-2" style="gap: 24px; margin-bottom: 24px;">
+    <!-- LEFT CARD: DOCTOR IDENTITY & PROFESSIONAL PROFILE -->
+    <div class="card" style="box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
+        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-user-doctor" style="color: var(--turquoise-primary);"></i>
+                <h2 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-primary); margin: 0;">Identity &amp; Professional Profile</h2>
+            </div>
+            <span class="user-role-tag" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: 700;">DOCTOR</span>
+        </div>
+
+        <div style="padding: 20px;">
+            <div style="display: flex; align-items: center; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-light); flex-wrap: wrap;">
+                <div style="position: relative; width: 96px; height: 96px; flex-shrink: 0;">
+                    <img src="{{ doctor_photo(doctor.profile_photo) }}" alt="{{ doctor.name }}"
+                         style="width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 3px solid var(--turquoise-primary); background: #f8fafc; box-shadow: 0 4px 12px rgba(0, 168, 204, 0.2);">
+                    <span style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); font-size: 0.65rem; padding: 2px 8px; border-radius: 9999px; background: var(--turquoise-primary); color: #fff; font-weight: 700; letter-spacing: 0.05em; white-space: nowrap;">
+                        DOCTOR
+                    </span>
+                </div>
+
+                <div style="flex: 1; min-width: 200px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                        <h3 style="font-size: 1.4rem; font-weight: 800; color: var(--navy-primary); margin: 0;">{{ doctor.name }}</h3>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="openPhotoUploadModal()" style="font-size: 0.75rem; padding: 3px 8px;">
+                            <i class="fa-solid fa-camera"></i> Change Photo
+                        </button>
+                    </div>
+                    <div style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">
+                        Doctor ID: <span style="font-family: var(--font-mono); color: #7c3aed; font-weight: 700;">{{ doctor.doctor_id }}</span>
+                        • User ID: <span style="font-family: var(--font-mono); color: var(--turquoise-primary); font-weight: 700;">{{ user.user_id }}</span>
+                    </div>
+                    <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 3px;">
+                        Username: <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0f172a;">{{ user.username }}</code>
+                        • {{ doctor.email or user.email }}
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 18px;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-stethoscope" style="width: 18px; color: var(--turquoise-primary);"></i> Specialization:</span>
+                    <strong style="color: var(--navy-primary); font-size: 0.9rem;">{{ doctor.specialization or doctor.specialty }}</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-graduation-cap" style="width: 18px; color: var(--turquoise-primary);"></i> Qualification:</span>
+                    <strong style="color: var(--navy-primary); font-size: 0.9rem;">{{ doctor.qualification or 'MBBS, MD Cardiology' }}</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-briefcase" style="width: 18px; color: var(--turquoise-primary);"></i> Experience:</span>
+                    <span style="color: var(--navy-primary); font-size: 0.9rem; font-weight: 600;">{{ doctor.experience or '8 Years' }}</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-hospital" style="width: 18px; color: var(--turquoise-primary);"></i> Department:</span>
+                    <span style="color: var(--navy-primary); font-size: 0.9rem; font-weight: 600;">{{ doctor.department }}</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-phone" style="width: 18px; color: var(--turquoise-primary);"></i> Phone Number:</span>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="badge" style="background: #f0fdfa; color: #0f766e; border: 1px solid #99f6e4; font-size: 0.72rem; font-weight: 700;">Verified</span>
+                        <span style="font-family: var(--font-mono); color: var(--navy-primary); font-weight: 700;">{{ doctor.demo_phone or '+1 (555) 019-2834' }}</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-envelope" style="width: 18px; color: var(--turquoise-primary);"></i> Official Email:</span>
+                    <span style="color: var(--navy-primary); font-size: 0.9rem; font-weight: 600;">{{ doctor.email or user.email }}</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-shield-halved" style="width: 18px; color: var(--turquoise-primary);"></i> Permission Level:</span>
+                    {% if doctor.permission_level == 'HIGHLY_CONFIDENTIAL' %}
+                        <span class="badge badge-high" style="background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; font-weight: 700;">LEVEL 3: HIGHLY CONFIDENTIAL</span>
+                    {% elif doctor.permission_level == 'CONFIDENTIAL' %}
+                        <span class="badge badge-medium" style="background: #fffbeb; color: #b45309; border: 1px solid #fde68a; font-weight: 700;">LEVEL 2: CONFIDENTIAL</span>
+                    {% else %}
+                        <span class="badge badge-low" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: 700;">LEVEL 1: NORMAL</span>
+                    {% endif %}
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-bed-pulse" style="width: 18px; color: var(--turquoise-primary);"></i> Assigned Patients:</span>
+                    <strong style="color: var(--turquoise-primary); font-size: 0.95rem;">{{ assigned_patients | length }} Critical Patients</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-laptop-medical" style="width: 18px; color: var(--turquoise-primary);"></i> Trusted Device:</span>
+                    <span class="badge badge-low" style="font-family: var(--font-mono); font-size: 0.74rem;">
+                        <i class="fa-solid fa-check" style="margin-right: 4px;"></i> {{ doctor.trusted_device_id or 'DEV-DOC01-TRUSTED' }}
+                    </span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-clock-rotate-left" style="width: 18px; color: var(--turquoise-primary);"></i> Last Login:</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-muted);">{{ doctor.last_login or 'Active Session' }}</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; padding-top: 4px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-circle-check" style="width: 18px; color: #10b981;"></i> Account Status:</span>
+                    <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">ACTIVE</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT CARD: ZERO-TRUST TELEMETRY & ASSIGNED ROSTER -->
+    <div class="card" style="box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
+        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-shield-halved" style="color: var(--turquoise-primary);"></i>
+                <h2 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-primary); margin: 0;">Zero-Trust Telemetry &amp; Patient Assignments</h2>
+            </div>
+            <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">ZERO-TRUST ACTIVE</span>
+        </div>
+
+        <div style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Active Hardware Workstation:</span>
+                <span style="font-family: var(--font-mono); font-weight: 600; color: var(--turquoise-primary);">{{ session.device_id or 'DEV-DOC01-TRUSTED' }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Hardware Trust Status:</span>
+                {% if session.device_status == 'TRUSTED' %}
+                    <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">
+                        <i class="fa-solid fa-check" style="margin-right: 4px;"></i> TRUSTED HARDWARE (-5 pts)
+                    </span>
+                {% else %}
+                    <span class="badge badge-critical" style="background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; font-weight: 700;">
+                        <i class="fa-solid fa-triangle-exclamation" style="margin-right: 4px;"></i> UNKNOWN TERMINAL (+20 pts)
+                    </span>
+                {% endif %}
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Active Session Token:</span>
+                <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #64748b; background: #f8fafc; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-light);">{{ session.session_id or 'SESS-ACTIVE' }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Demo MFA Verification:</span>
+                <span style="color: #059669; font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; gap: 4px;">
+                    <i class="fa-solid fa-circle-check"></i> Passed (Cryptographic Token)
+                </span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Dynamic Risk Score:</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-family: var(--font-mono); font-weight: 800; font-size: 1.15rem; color: {% if session.risk_score|default(10) > 60 %}#dc2626{% elif session.risk_score|default(10) > 30 %}#d97706{% else %}#059669{% endif %};">
+                        {{ session.risk_score|default(10) }} / 100
+                    </span>
+                    <span class="badge {% if session.risk_level|default('LOW') == 'CRITICAL' %}badge-critical{% elif session.risk_level|default('LOW') == 'HIGH' %}badge-high{% elif session.risk_level|default('LOW') == 'MEDIUM' %}badge-medium{% else %}badge-low{% endif %}">
+                        {{ session.risk_level|default('LOW') }}
+                    </span>
+                </div>
+            </div>
+
+            {% if assigned_patients %}
+            <div style="margin-top: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label style="font-size: 0.82rem; color: var(--navy-primary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Authorized Patient Roster</label>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">{{ assigned_patients | length }} Active Cases</span>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    {% for p in assigned_patients %}
+                        <a href="{{ url_for('patients.patient_detail', patient_id=p.patient_id) }}" style="text-decoration: none;">
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 8px; background: #f8fafc; border: 1px solid var(--border-light); transition: all 0.2s;" onmouseover="this.style.borderColor='var(--turquoise-primary)'; this.style.background='#f0fdfa';" onmouseout="this.style.borderColor='var(--border-light)'; this.style.background='#f8fafc';">
+                                <img src="{{ patient_photo(p.profile_photo) }}" alt="{{ p.name }}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover;">
+                                <div>
+                                    <span style="font-size: 0.82rem; font-weight: 700; color: var(--navy-primary);">{{ p.patient_id }}</span>
+                                    <span style="font-size: 0.74rem; color: var(--text-muted); margin-left: 4px;">{{ p.name }}</span>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ====================================================================
+     CASE 3: SYSTEM ADMINISTRATOR PROFILE VIEW
+     ==================================================================== -->
+{% else %}
+<div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+    <div>
+        <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--navy-primary); display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-shield-halved" style="color: #f59e0b;"></i> Security Operations Center Administrator Profile
+        </h1>
+        <p style="color: var(--text-muted); margin-top: 4px; font-size: 0.95rem;">
+            Verified administrative credentials, SOC monitoring privileges, and zero-trust clearance.
+        </p>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-chart-line"></i> SOC Dashboard
+        </a>
+        <a href="{{ url_for('admin.manage_users') }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-users-gear"></i> User Management
+        </a>
+        <span class="badge badge-low" style="font-size: 0.82rem; padding: 6px 14px; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">
+            <i class="fa-solid fa-circle" style="font-size: 0.6rem; margin-right: 6px; color: #10b981;"></i> STATUS: ACTIVE SESSION
+        </span>
+    </div>
+</div>
+
+<div class="grid-2" style="gap: 24px; margin-bottom: 24px;">
+    <!-- LEFT CARD: ADMIN IDENTITY -->
+    <div class="card" style="box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
+        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-user-shield" style="color: #f59e0b;"></i>
+                <h2 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-primary); margin: 0;">SOC Administrator Identity</h2>
+            </div>
+            <span class="user-role-tag" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-weight: 700;">ADMIN</span>
+        </div>
+
+        <div style="padding: 20px;">
+            <div style="display: flex; align-items: center; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-light); flex-wrap: wrap;">
+                <div style="position: relative; width: 96px; height: 96px; flex-shrink: 0;">
+                    <img src="{{ doctor_photo(None) }}" alt="{{ user.name }}"
+                         style="width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 3px solid #f59e0b; background: #f8fafc; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);">
+                    <span style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); font-size: 0.65rem; padding: 2px 8px; border-radius: 9999px; background: #f59e0b; color: #fff; font-weight: 700; letter-spacing: 0.05em; white-space: nowrap;">
+                        ADMIN
+                    </span>
+                </div>
+
+                <div style="flex: 1; min-width: 200px;">
+                    <h3 style="font-size: 1.4rem; font-weight: 800; color: var(--navy-primary); margin: 0;">{{ user.name }}</h3>
+                    <div style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">
+                        User ID: <span style="font-family: var(--font-mono); color: #f59e0b; font-weight: 700;">{{ user.user_id }}</span>
+                    </div>
+                    <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 3px;">
+                        Username: <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0f172a;">{{ user.username }}</code>
+                        • {{ user.email }}
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 18px;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-shield-virus" style="width: 18px; color: #f59e0b;"></i> Clearance Level:</span>
+                    <span class="badge badge-critical" style="font-weight: 700;">MAXIMUM ADMIN (ALL TIERS)</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-fingerprint" style="width: 18px; color: #f59e0b;"></i> Access Scope:</span>
+                    <strong style="color: var(--navy-primary); font-size: 0.9rem;">Global Threat IDS &amp; Decoy Sandbox</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 4px; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.88rem;"><i class="fa-solid fa-circle-check" style="width: 18px; color: #10b981;"></i> Account Status:</span>
+                    <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">ACTIVE</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT CARD: SOC TELEMETRY -->
+    <div class="card" style="box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
+        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-satellite-dish" style="color: #f59e0b;"></i>
+                <h2 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-primary); margin: 0;">SOC Station Telemetry</h2>
+            </div>
+            <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">SECURE STATION</span>
+        </div>
+
+        <div style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Active Hardware Station:</span>
+                <span style="font-family: var(--font-mono); font-weight: 600; color: #f59e0b;">{{ session.device_id or 'DEV-ADMIN-TRUSTED' }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Station Trust Status:</span>
+                <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">
+                    <i class="fa-solid fa-check" style="margin-right: 4px;"></i> TRUSTED HARDWARE
+                </span>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Session Token:</span>
+                <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #64748b; background: #f8fafc; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-light);">{{ session.session_id or 'SESS-ADMIN' }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.88rem;">Dynamic Risk Score:</span>
+                <span class="badge badge-low">{{ session.risk_score|default(10) }} / 100 (LOW)</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- ====================================================================
+     SHARED: RECENT ACTIVITY AUDIT TRAIL
+     ==================================================================== -->
+<div class="card" style="box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light); margin-bottom: 30px;">
+    <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-clock-rotate-left" style="color: var(--turquoise-primary);"></i>
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-primary); margin: 0;">My Recent Security &amp; Access Activity</h3>
+        </div>
+        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: var(--font-mono); font-weight: 600;">
+            <i class="fa-solid fa-lock" style="margin-right: 4px; color: var(--turquoise-primary);"></i> SHA-256 Tamper-Evident Trail
+        </span>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>TIMESTAMP</th>
+                    <th>ACTION</th>
+                    <th>TARGET PATIENT</th>
+                    <th>DEVICE</th>
+                    <th>RISK SCORE</th>
+                    <th>RESULT</th>
+                    <th>DETAILS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for act in recent_activity %}
+                <tr>
+                    <td style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted); white-space: nowrap;">{{ act.timestamp }}</td>
+                    <td style="font-weight: 700; color: var(--navy-primary);">{{ act.action }}</td>
+                    <td>
+                        {% if act.patient_id %}
+                            <span style="font-family: var(--font-mono); font-weight: 700; color: var(--turquoise-primary);">{{ act.patient_id }}</span>
+                        {% else %}
+                            <span style="color: var(--text-muted);">--</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge {% if act.device_status == 'TRUSTED' %}badge-low{% else %}badge-critical{% endif %}" style="font-size: 0.7rem;">
+                            {{ act.device_status }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge {% if act.risk_score > 60 %}badge-critical{% elif act.risk_score > 30 %}badge-medium{% else %}badge-low{% endif %}">
+                            {{ act.risk_score }} / 100
+                        </span>
+                    </td>
+                    <td>
+                        {% if act.result == 'SUCCESS' %}
+                            <span class="badge badge-low">SUCCESS</span>
+                        {% elif act.result == 'DECOY_SERVED' %}
+                            <span class="badge badge-critical">DECOY SERVED</span>
+                        {% else %}
+                            <span class="badge badge-medium">{{ act.result }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-size: 0.82rem; color: var(--text-muted);">{{ act.details }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 24px; color: var(--text-muted);">No recent activity logged for this session.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ====================================================================
+     MODAL: EDIT PATIENT PROFILE (SELF-UPDATE)
+     ==================================================================== -->
+{% if patient %}
+<div id="patientEditModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); z-index: 9999; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;">
+    <div class="card" style="max-width: 650px; width: 100%; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); margin: auto;">
+        <div class="card-header" style="background: #f8fafc; padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-user-pen" style="color: var(--turquoise-primary);"></i>
+                <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--navy-primary);">Update Patient Profile Details</h3>
+            </div>
+            <button type="button" onclick="closePatientEditModal()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+
+        <form action="{{ url_for('auth.edit_own_profile') }}" method="POST" enctype="multipart/form-data" style="padding: 22px;">
+            <div class="grid-2" style="gap: 16px; margin-bottom: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Patient ID (Locked)</label>
+                    <input type="text" class="form-control" value="{{ patient.patient_id }}" readonly style="background: #f1f5f9; color: #64748b; font-family: var(--font-mono);">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Full Name <span style="color: #ef4444;">*</span></label>
+                    <input type="text" name="name" class="form-control" value="{{ patient.name }}" required>
+                </div>
+            </div>
+
+            <div class="grid-2" style="gap: 16px; margin-bottom: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Contact Email <span style="color: #ef4444;">*</span></label>
+                    <input type="email" name="email" class="form-control" value="{{ patient.email or user.email }}" required>
+                </div>
+
+                <!-- PHONE NUMBER WITH COUNTRY CODE SUPPORT -->
+                {% set pat_cc, pat_local = split_country_code(patient.phone_number) %}
+                <div class="form-group">
+                    <label class="form-label">Phone Number (With Country Code)</label>
+                    <div style="display: flex; gap: 8px;">
+                        <select name="country_code" class="form-control" style="width: 140px; flex-shrink: 0;">
+                            {% for c in country_codes %}
+                            <option value="{{ c.code }}" {% if c.code == pat_cc %}selected{% endif %}>
+                                {{ c.flag }} {{ c.code }} ({{ c.country.split('/')[0].strip() }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <input type="text" name="phone_number" class="form-control" value="{{ pat_local }}" placeholder="(555) 019-1001" required>
+                    </div>
+                    <small style="color: var(--text-muted); font-size: 0.74rem;">Format: (555) 000-0000 or national number</small>
+                </div>
+            </div>
+
+            <div class="grid-3" style="gap: 16px; margin-bottom: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Age</label>
+                    <input type="number" name="age" class="form-control" min="1" max="120" value="{{ patient.age }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Gender</label>
+                    <select name="gender" class="form-control">
+                        <option value="Male" {% if patient.gender == 'Male' %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if patient.gender == 'Female' %}selected{% endif %}>Female</option>
+                        <option value="Other" {% if patient.gender == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Blood Group</label>
+                    <select name="blood_group" class="form-control">
+                        {% for bg in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                        <option value="{{ bg }}" {% if patient.blood_group == bg %}selected{% endif %}>{{ bg }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid-2" style="gap: 16px; margin-bottom: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Emergency Contact</label>
+                    <input type="text" name="emergency_contact" class="form-control" value="{{ patient.emergency_contact }}" placeholder="e.g. Spouse: Priya - +1 (555) 019-9999" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Heart Condition Category</label>
+                    <input type="text" name="heart_condition_category" class="form-control" value="{{ patient.heart_condition_category }}" placeholder="e.g. Acute Myocardial Infarction" required>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label">Medical History Summary (Demo / Synthetic)</label>
+                <textarea name="medical_history" class="form-control" rows="3" required>{{ patient.medical_history }}</textarea>
+            </div>
+
+            <!-- PHOTO UPLOAD WITH LIVE PREVIEW BEFORE SAVING -->
+            <div class="form-group" style="margin-bottom: 18px; background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px dashed var(--border-light);">
+                <label class="form-label" style="display: flex; justify-content: space-between;">
+                    <span><i class="fa-solid fa-camera"></i> Update Profile Photo (Optional)</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">JPG, JPEG, PNG, WEBP (Max 5MB)</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 16px; margin-top: 8px;">
+                    <img id="editPatientPhotoPreview" src="{{ patient_photo(patient.profile_photo) }}" alt="Preview"
+                         style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--turquoise-primary);">
+                    <div style="flex: 1;">
+                        <input type="file" name="profile_photo" accept=".jpg,.jpeg,.png,.webp" class="form-control" style="font-size: 0.85rem;" onchange="previewSelectedImage(this, 'editPatientPhotoPreview')">
+                        <small style="color: var(--text-muted); font-size: 0.72rem;">Preview updates immediately. Safe random hash filename stored.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECURITY NOTICE -->
+            <div style="background: #f1f5f9; padding: 10px 14px; border-radius: 6px; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 18px;">
+                <i class="fa-solid fa-lock" style="color: var(--navy-primary); margin-right: 4px;"></i>
+                <strong>Zero-Trust Safeguard:</strong> Patient ID ({{ patient.patient_id }}) and Assigned Cardiologist are protected by hospital clinical governance. All updates are logged to the tamper-evident audit trail.
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-secondary" onclick="closePatientEditModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-check"></i> Save Profile Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: UPLOAD PATIENT PHOTO -->
+<div id="patientPhotoUploadModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
+    <div class="card" style="max-width: 480px; width: 100%; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); margin: auto;">
+        <div class="card-header" style="background: #f8fafc; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-camera" style="color: var(--turquoise-primary);"></i>
+                <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--navy-primary);">Upload Patient Profile Photo</h3>
+            </div>
+            <button type="button" onclick="closePatientPhotoModal()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+
+        <form action="{{ url_for('auth.upload_own_photo') }}" method="POST" enctype="multipart/form-data" style="padding: 22px;">
+            <div style="text-align: center; margin-bottom: 18px;">
+                <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 12px;">
+                    <img id="livePatientPhotoPreview" src="{{ patient_photo(patient.profile_photo) }}" alt="Preview"
+                         style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--turquoise-primary); box-shadow: 0 4px 15px rgba(0, 168, 204, 0.25);">
+                </div>
+                <div style="font-size: 0.88rem; font-weight: 700; color: var(--navy-primary);">{{ patient.name }}</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">{{ patient.patient_id }} • {{ patient.heart_condition_category }}</div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 18px;">
+                <label class="form-label">Select Image File</label>
+                <input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp" class="form-control" required onchange="previewSelectedImage(this, 'livePatientPhotoPreview')">
+                <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 4px; display: block;">
+                    Allowed: JPG, JPEG, PNG, WEBP • Max Size: 5MB • Safe random hash filename stored.
+                </small>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-secondary" onclick="closePatientPhotoModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload &amp; Save Photo
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<!-- ====================================================================
+     MODALS: DOCTOR EDIT & PHOTO (FOR CLINICIAN)
+     ==================================================================== -->
+{% if doctor %}
+<!-- MODAL: EDIT DOCTOR PROFILE -->
+<div id="doctorEditModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); z-index: 9999; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;">
+    <div class="card" style="max-width: 650px; width: 100%; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); margin: auto;">
+        <div class="card-header" style="background: #f8fafc; padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-user-pen" style="color: var(--turquoise-primary);"></i>
+                <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--navy-primary);">Update Doctor Profile</h3>
+            </div>
+            <button type="button" onclick="closeDoctorEditModal()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+
+        <form action="{{ url_for('auth.edit_own_profile') }}" method="POST" enctype="multipart/form-data" style="padding: 22px;">
+            <div class="grid-2" style="gap: 16px; margin-bottom: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Doctor ID (Locked)</label>
+                    <input type="text" class="form-control" value="{{ doctor.doctor_id }}" readonly style="background: #f1f5f9; color: #64748b; font-family: var(--font-mono);">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Full Name <span style="color: #ef4444;">*</span></label>
+                    <input type="text" name="name" class="form-control" value="{{ doctor.name }}" required>
+                </div>
+            </div>
+
+            <div class="grid-2" style="gap: 16px; margin-bottom: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Specialization <span style="color: #ef4444;">*</span></label>
+                    <input type="text" name="specialization" class="form-control" value="{{ doctor.specialization or doctor.specialty }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Department <span style="color: #ef4444;">*</span></label>
+                    <input type="text" name="department" class="form-control" value="{{ doctor.department }}" required>
+                </div>
+            </div>
+
+            <div class="grid-2" style="gap: 16px; margin-bottom: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Medical Qualification</label>
+                    <input type="text" name="qualification" class="form-control" value="{{ doctor.qualification or 'MBBS, MD Cardiology' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Clinical Experience</label>
+                    <input type="text" name="experience" class="form-control" value="{{ doctor.experience or '8 Years' }}">
+                </div>
+            </div>
+
+            <div class="grid-2" style="gap: 16px; margin-bottom: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Official Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ doctor.email or user.email }}">
+                </div>
+
+                <!-- PHONE NUMBER WITH COUNTRY CODE SUPPORT -->
+                {% set doc_cc, doc_local = split_country_code(doctor.demo_phone) %}
+                <div class="form-group">
+                    <label class="form-label">Phone Number (With Country Code)</label>
+                    <div style="display: flex; gap: 8px;">
+                        <select name="country_code" class="form-control" style="width: 140px; flex-shrink: 0;">
+                            {% for c in country_codes %}
+                            <option value="{{ c.code }}" {% if c.code == doc_cc %}selected{% endif %}>
+                                {{ c.flag }} {{ c.code }} ({{ c.country.split('/')[0].strip() }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <input type="text" name="demo_phone" class="form-control" value="{{ doc_local }}" placeholder="(555) 019-2834" required>
+                    </div>
+                    <small style="color: var(--text-muted); font-size: 0.74rem;">Format: (555) 000-0000 or national number</small>
+                </div>
+            </div>
+
+            <!-- PHOTO UPLOAD WITH PREVIEW BEFORE SAVING -->
+            <div class="form-group" style="margin-bottom: 18px; background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px dashed var(--border-light);">
+                <label class="form-label" style="display: flex; justify-content: space-between;">
+                    <span><i class="fa-solid fa-camera"></i> Update Profile Photo (Optional)</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">JPG, JPEG, PNG, WEBP (Max 5MB)</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 16px; margin-top: 8px;">
+                    <img id="editDocPhotoPreview" src="{{ doctor_photo(doctor.profile_photo) }}" alt="Preview"
+                         style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--turquoise-primary);">
+                    <div style="flex: 1;">
+                        <input type="file" name="profile_photo" accept=".jpg,.jpeg,.png,.webp" class="form-control" style="font-size: 0.85rem;" onchange="previewSelectedImage(this, 'editDocPhotoPreview')">
+                        <small style="color: var(--text-muted); font-size: 0.72rem;">Preview updates immediately. File validated securely before server write.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECURITY NOTICE -->
+            <div style="background: #f1f5f9; padding: 10px 14px; border-radius: 6px; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 18px;">
+                <i class="fa-solid fa-lock" style="color: var(--navy-primary); margin-right: 4px;"></i>
+                <strong>Security Constraint:</strong> Clearance Level ({{ doctor.permission_level }}) and Patient Assignments are locked by Security Administration under HIPAA/Zero-Trust policy.
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-secondary" onclick="closeDoctorEditModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-check"></i> Save Profile Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: UPLOAD DOCTOR PHOTO -->
+<div id="photoUploadModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
+    <div class="card" style="max-width: 480px; width: 100%; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); margin: auto;">
+        <div class="card-header" style="background: #f8fafc; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-camera" style="color: var(--turquoise-primary);"></i>
+                <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--navy-primary);">Upload Doctor Profile Photo</h3>
+            </div>
+            <button type="button" onclick="closePhotoUploadModal()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+
+        <form action="{{ url_for('auth.upload_own_photo') }}" method="POST" enctype="multipart/form-data" style="padding: 22px;">
+            <div style="text-align: center; margin-bottom: 18px;">
+                <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 12px;">
+                    <img id="livePhotoPreview" src="{{ doctor_photo(doctor.profile_photo) }}" alt="Preview"
+                         style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--turquoise-primary); box-shadow: 0 4px 15px rgba(0, 168, 204, 0.25);">
+                </div>
+                <div style="font-size: 0.88rem; font-weight: 700; color: var(--navy-primary);">{{ doctor.name }}</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">{{ doctor.doctor_id }} • {{ doctor.specialization or doctor.specialty }}</div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 18px;">
+                <label class="form-label">Select Image File</label>
+                <input type="file" name="photo" id="modalPhotoInput" accept=".jpg,.jpeg,.png,.webp" class="form-control" required onchange="previewSelectedImage(this, 'livePhotoPreview')">
+                <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 4px; display: block;">
+                    Allowed: JPG, JPEG, PNG, WEBP • Max Size: 5MB • Safe random hash filename stored.
+                </small>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-secondary" onclick="closePhotoUploadModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload &amp; Save Photo
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<!-- ====================================================================
+     JAVASCRIPT MODAL & PHOTO PREVIEW CONTROLS
+     ==================================================================== -->
+<script>
+function openPatientEditModal() {
+    const modal = document.getElementById('patientEditModal');
+    if (modal) modal.style.display = 'flex';
+}
+function closePatientEditModal() {
+    const modal = document.getElementById('patientEditModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function openPatientPhotoModal() {
+    const modal = document.getElementById('patientPhotoUploadModal');
+    if (modal) modal.style.display = 'flex';
+}
+function closePatientPhotoModal() {
+    const modal = document.getElementById('patientPhotoUploadModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function openDoctorEditModal() {
+    const modal = document.getElementById('doctorEditModal');
+    if (modal) modal.style.display = 'flex';
+}
+function closeDoctorEditModal() {
+    const modal = document.getElementById('doctorEditModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function openPhotoUploadModal() {
+    const modal = document.getElementById('photoUploadModal');
+    if (modal) modal.style.display = 'flex';
+}
+function closePhotoUploadModal() {
+    const modal = document.getElementById('photoUploadModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function previewSelectedImage(input, previewId) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        if (!validExtensions.includes(ext)) {
+            alert('Invalid file format. Please select a JPG, JPEG, PNG, or WEBP image.');
+            input.value = '';
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size exceeds the 5MB maximum limit. Please choose a smaller image.');
+            input.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById(previewId);
+            if (preview) {
+                preview.src = e.target.result;
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Close on outside background click
+window.addEventListener('click', function(e) {
+    ['patientEditModal', 'patientPhotoUploadModal', 'doctorEditModal', 'photoUploadModal'].forEach(function(modalId) {
+        const m = document.getElementById(modalId);
+        if (m && e.target === m) {
+            m.style.display = 'none';
+        }
+    });
+});
+
+// Close on ESC key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        ['patientEditModal', 'patientPhotoUploadModal', 'doctorEditModal', 'photoUploadModal'].forEach(function(modalId) {
+            const m = document.getElementById(modalId);
+            if (m) {
+                m.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

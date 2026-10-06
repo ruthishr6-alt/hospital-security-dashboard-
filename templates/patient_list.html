@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Inpatient Cardiac Registry | Critical Heart Patient Security{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 28px;">
+    <!-- HEADER -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+        <div>
+            <h1 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 10px;">
+                🫀 Inpatient Cardiac Registry &amp; Patient Directory
+            </h1>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
+                {% if user.role == 'admin' %}
+                    Executive administrative oversight of all protected synthetic cardiac patient charts.
+                {% else %}
+                    Authorized critical cardiac roster for Doctor ID: <code>{{ doctor.doctor_id if doctor else 'D001' }}</code>.
+                {% endif %}
+            </p>
+        </div>
+
+        <form action="{{ url_for('patients.patient_list') }}" method="GET" style="display: flex; gap: 8px;">
+            <input type="text" name="q" class="form-control" placeholder="Search by name, ID, or condition..." value="{{ query_str or '' }}" style="width: 280px; padding: 8px 14px; font-size: 0.85rem;">
+            <button type="submit" class="btn btn-primary btn-sm">Filter Roster</button>
+            {% if query_str %}
+                <a href="{{ url_for('patients.patient_list') }}" class="btn btn-secondary btn-sm">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- MANDATORY SYNTHETIC DATA NOTICE -->
+    <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <span style="color: #1e40af; font-size: 0.84rem; font-weight: 700;">
+            ⚠️ DEMO DATA – NOT REAL PATIENT INFORMATION • Academic Cybersecurity Prototype
+        </span>
+        <span class="badge badge-low" style="font-size: 0.72rem;">
+            RBAC + Honeypot Decoy Shield Active
+        </span>
+    </div>
+
+    <!-- PATIENT ROSTER TABLE -->
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">📋 Inpatient Cardiac Registry ({{ patients | length }} Records)</h2>
+                <p class="card-subtitle">Zero-Trust Protected Health Data Architecture</p>
+            </div>
+            <span class="badge badge-low">Access: Authorized</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Patient ID</th>
+                        <th>Age / Sex</th>
+                        <th>Blood</th>
+                        <th>Cardiac Condition Category</th>
+                        <th>Sensitivity Tier</th>
+                        <th>Telemetry Vitals</th>
+                        <th>Assigned Doctor</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in patients %}
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <img src="{{ patient_photo(p.profile_photo, False) }}" alt="{{ p.name }}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #ef4444; flex-shrink: 0; background: #fee2e2;">
+                                <div>
+                                    <div style="font-weight: 700; color: var(--text-main); font-size: 0.88rem;">{{ p.name }}</div>
+                                    <span class="badge badge-medium" style="font-size: 0.58rem; padding: 1px 5px; background: #fee2e2; color: #991b1b; border-color: #fca5a5;">PATIENT – DEMO</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span style="font-family: var(--font-mono); font-weight: 700; color: #0284c7;">
+                                {{ p.patient_id }}
+                            </span>
+                        </td>
+                        <td style="color: var(--text-secondary);">
+                            <div>{{ p.age }} yrs / {{ p.gender }}</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px;">
+                                <i class="fa-solid fa-phone" style="font-size: 0.68rem; color: var(--turquoise-primary);"></i>
+                                {% if current_user and (current_user.role == 'admin' or current_user.doctor_id == p.assigned_doctor_id) %}
+                                    {{ p.phone_number or '+1 (555) 019-1001' }}
+                                {% else %}
+                                    {{ mask_phone(p.phone_number) }}
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td><span class="badge badge-low">{{ p.blood_group }}</span></td>
+                        <td>
+                            <span class="badge" style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; font-size: 0.72rem;">
+                                {{ p.heart_condition_category }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if p.record_sensitivity_level == 'HIGHLY_CONFIDENTIAL' %}
+                                <span class="badge badge-critical">HIGHLY CONFIDENTIAL</span>
+                            {% elif p.record_sensitivity_level == 'CONFIDENTIAL' %}
+                                <span class="badge badge-medium">CONFIDENTIAL</span>
+                            {% else %}
+                                <span class="badge badge-low">NORMAL</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% set v = format_vitals(p.vitals) %}
+                            <span style="font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600; color: var(--navy-primary); display: inline-flex; align-items: center; gap: 4px;">
+                                <i class="fa-solid fa-heart-pulse" style="color: #ef4444; font-size: 0.72rem;"></i> {{ v.summary }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="user-role-tag">
+                                {{ p.assigned_doctor_id }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('patients.patient_detail', patient_id=p.patient_id) }}" class="btn btn-primary btn-sm">
+                                View Medical Record →
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            No patients found matching your search criteria.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Confidential Records Vault - {{ SYSTEM_NAME }}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px;">
+    <!-- HEADER -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 20px;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h1 style="font-size: 1.6rem; font-weight: 800; color: var(--navy-primary); display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-lock" style="color: var(--navy-accent);"></i> Confidential Records Vault
+                </h1>
+                <span class="badge badge-medium" style="background: #fffbeb; color: #b45309; border: 1px solid #fde68a;">Multi-Tier Clearance Required</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
+                Genetic sequencing panels, organ transplant protocols, and investigational cardiac trial logs.
+            </p>
+        </div>
+
+        <div class="card" style="padding: 8px 16px; font-size: 0.82rem; background: #f8fafc; border: 1px solid var(--border-light); box-shadow: none;">
+            <span style="color: var(--text-muted);">Your Clinician Clearance Level: </span>
+            <strong style="color: #0284c7; font-family: var(--font-mono); margin-left: 6px;">
+                {{ doctor.permission_level if doctor else 'ADMINISTRATOR' }}
+            </strong>
+        </div>
+    </div>
+
+    <!-- Sensitivity Guide Cards -->
+    <div class="grid-3" style="margin-bottom: 24px; gap: 16px;">
+        <div class="card" style="border-left: 4px solid #10b981; padding: 16px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                <i class="fa-solid fa-file-medical" style="color: #10b981;"></i>
+                <strong style="color: #047857; font-size: 0.88rem;">NORMAL TIER</strong>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.45;">
+                Routine cardiology clinical progress notes. Accessible by any authorized attending physician.
+            </p>
+        </div>
+
+        <div class="card" style="border-left: 4px solid #f59e0b; padding: 16px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                <i class="fa-solid fa-file-shield" style="color: #f59e0b;"></i>
+                <strong style="color: #b45309; font-size: 0.88rem;">CONFIDENTIAL TIER</strong>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.45;">
+                Genetic cardiac mutations &amp; investigational devices. Requires CONFIDENTIAL or higher clearance.
+            </p>
+        </div>
+
+        <div class="card" style="border-left: 4px solid #ef4444; padding: 16px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                <i class="fa-solid fa-radiation" style="color: #ef4444;"></i>
+                <strong style="color: #b91c1c; font-size: 0.88rem;">HIGHLY CONFIDENTIAL TIER</strong>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.45;">
+                Transplant donor matching &amp; psychiatric stress trials. Requires Senior Cardiologist / Admin clearance.
+            </p>
+        </div>
+    </div>
+
+    <!-- Confidential Records Table -->
+    <div class="card" style="box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
+        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-vault" style="color: var(--navy-accent);"></i>
+                <span class="card-title" style="font-size: 1.05rem; font-weight: 700; color: var(--navy-primary);">Restricted Clinical Dossiers ({{ records|length }} files)</span>
+            </div>
+            <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">Cryptographic Access Control</span>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Sensitivity Tier</th>
+                        <th>Patient ID / Name</th>
+                        <th>Dossier Title</th>
+                        <th>Restricted Clinical Content</th>
+                        <th>Clearance Reason</th>
+                        <th>Access Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in records %}
+                    <tr>
+                        <td>
+                            {% if r.sensitivity_level == 'HIGHLY_CONFIDENTIAL' %}
+                                <span class="badge badge-critical" style="font-weight: 700;">🔴 HIGHLY CONFIDENTIAL</span>
+                            {% else %}
+                                <span class="badge badge-medium" style="font-weight: 700;">🟡 CONFIDENTIAL</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <img src="{{ patient_photo(r.patient_photo, False) }}" alt="{{ r.patient_name }}" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #ef4444; flex-shrink: 0;">
+                                <div>
+                                    <strong style="color: var(--navy-primary); font-size: 0.88rem;">{{ r.patient_name }}</strong>
+                                    <div style="display: flex; align-items: center; gap: 4px; margin-top: 2px;">
+                                        <span class="badge" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-size: 0.65rem; padding: 1px 5px; font-family: var(--font-mono); font-weight: 700;">
+                                            {{ r.patient_id }}
+                                        </span>
+                                        <span class="badge" style="font-size: 0.6rem; padding: 1px 4px; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; font-weight: 700;">DEMO</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="font-weight: 700; font-size: 0.86rem; color: var(--navy-primary);">
+                            {{ r.title }}
+                        </td>
+                        <td style="font-size: 0.82rem; max-width: 340px; line-height: 1.45;">
+                            {% if r.can_view %}
+                                <span style="color: var(--navy-primary);">{{ r.confidential_notes }}</span>
+                            {% else %}
+                                <span style="color: #94a3b8; font-family: var(--font-mono); font-style: italic; background: #f8fafc; padding: 4px 8px; border-radius: 4px; border: 1px dashed #cbd5e1; display: inline-block;">
+                                    🔒 [REDACTED: Clearance insufficient or patient unassigned]
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td style="font-size: 0.8rem; color: var(--text-muted);">
+                            {{ r.restricted_reason }}
+                        </td>
+                        <td>
+                            {% if r.can_view %}
+                                <a href="{{ url_for('patients.patient_detail', patient_id=r.patient_id) }}" class="btn btn-primary btn-sm" style="font-size: 0.78rem; padding: 5px 10px; display: inline-flex; align-items: center; gap: 4px;">
+                                    Open Chart <i class="fa-solid fa-arrow-right" style="font-size: 0.7rem;"></i>
+                                </a>
+                            {% else %}
+                                <span class="badge badge-critical" title="Insufficient clearance" style="font-weight: 700; padding: 4px 8px;">
+                                    ⛔ LOCKED
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

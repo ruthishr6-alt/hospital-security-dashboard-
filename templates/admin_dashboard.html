@@ -1,0 +1,478 @@
+{% extends "base.html" %}
+
+{% block title %}Hospital SOC & Executive Security Dashboard | Critical Heart Patient Security{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 28px;">
+    <!-- Dashboard Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--text-main);">🛡️ Hospital Security Operations Center (SOC)</h1>
+                <span class="security-status-indicator {{ cards.threat_color }}">
+                    ● DEFENSE LEVEL: {{ cards.system_threat_level }}
+                </span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
+                Critical Heart Patient Telemetry Defense • Multi-Factor RBAC • Honeypot Deception Subsystem
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{{ url_for('security.risk_analysis') }}" class="btn btn-primary btn-sm">
+                ⚡ 6 Attack Scenarios
+            </a>
+            <a href="{{ url_for('security.alerts') }}" class="btn btn-secondary btn-sm">
+                ⚠️ Live Alerts ({{ cards.suspicious_sessions }})
+            </a>
+            <a href="{{ url_for('decoy.decoy_monitor') }}" class="btn btn-secondary btn-sm" style="color: #7c3aed; border-color: #ddd6fe;">
+                🎭 Honeypot Traps ({{ cards.decoy_sessions }})
+            </a>
+        </div>
+    </div>
+
+    <!-- 1. HOSPITAL EXECUTIVE METRIC CARDS -->
+    <div class="stats-grid">
+        <!-- Card 1: Critical Heart Patients -->
+        <div class="stat-card" style="border-left-color: #ef4444;">
+            <div class="stat-header">
+                <span class="stat-label">CRITICAL HEART PATIENTS</span>
+                <span class="stat-icon-bubble" style="background: #fee2e2; color: #dc2626;">🫀</span>
+            </div>
+            <div class="stat-value" style="color: #dc2626;">{{ cards.total_patients }}</div>
+            <div class="stat-sub">
+                <span class="trend-badge trend-up">● Inpatient</span>
+                <span>Protected Cardiac Records</span>
+            </div>
+        </div>
+
+        <!-- Card 2: Authorized Doctors -->
+        <div class="stat-card" style="border-left-color: var(--primary-blue);">
+            <div class="stat-header">
+                <span class="stat-label">AUTHORIZED DOCTORS</span>
+                <span class="stat-icon-bubble" style="background: var(--primary-blue-light); color: var(--primary-blue);">👨‍⚕️</span>
+            </div>
+            <div class="stat-value" style="color: var(--primary-blue);">{{ cards.total_doctors }}</div>
+            <div class="stat-sub">
+                <span class="trend-badge trend-up">● Active</span>
+                <span>Vetted Cardiologists</span>
+            </div>
+        </div>
+
+        <!-- Card 3: Active Sessions -->
+        <div class="stat-card" style="border-left-color: #0ea5e9;">
+            <div class="stat-header">
+                <span class="stat-label">ACTIVE SESSIONS</span>
+                <span class="stat-icon-bubble" style="background: #e0f2fe; color: #0284c7;">💻</span>
+            </div>
+            <div class="stat-value" style="color: #0284c7;">{{ cards.active_sessions }}</div>
+            <div class="stat-sub">
+                <span class="trend-badge trend-up">● Online</span>
+                <span>Live Hospital Terminals</span>
+            </div>
+        </div>
+
+        <!-- Card 4: Suspicious Activities -->
+        <div class="stat-card" style="border-left-color: #f97316;">
+            <div class="stat-header">
+                <span class="stat-label">SUSPICIOUS ACTIVITIES</span>
+                <span class="stat-icon-bubble" style="background: #ffedd5; color: #ea580c;">⚠️</span>
+            </div>
+            <div class="stat-value" style="color: #ea580c;">{{ cards.suspicious_sessions }}</div>
+            <div class="stat-sub">
+                <span class="trend-badge trend-warning">Flagged</span>
+                <span>Threat Incident Alerts</span>
+            </div>
+        </div>
+
+        <!-- Card 5: Blocked Attempts -->
+        <div class="stat-card" style="border-left-color: #ef4444;">
+            <div class="stat-header">
+                <span class="stat-label">BLOCKED ATTEMPTS</span>
+                <span class="stat-icon-bubble" style="background: #fee2e2; color: #dc2626;">⛔</span>
+            </div>
+            <div class="stat-value" style="color: #dc2626;">{{ cards.blocked_attempts }}</div>
+            <div class="stat-sub">
+                <span class="trend-badge trend-down">Shielded</span>
+                <span>Unauthorized Traversal</span>
+            </div>
+        </div>
+
+        <!-- Card 6: Active Decoy Sessions -->
+        <div class="stat-card" style="border-left-color: #7c3aed;">
+            <div class="stat-header">
+                <span class="stat-label">ACTIVE DECOY SESSIONS</span>
+                <span class="stat-icon-bubble" style="background: #f5f3ff; color: #7c3aed;">🎭</span>
+            </div>
+            <div class="stat-value" style="color: #7c3aed;">{{ cards.decoy_sessions }}</div>
+            <div class="stat-sub">
+                <span class="trend-badge" style="background: #ede9fe; color: #6d28d9;">Trapped</span>
+                <span>Canary Honeypot Nodes</span>
+            </div>
+        </div>
+
+        <!-- Card 7: Critical Threats -->
+        <div class="stat-card" style="border-left-color: #b91c1c;">
+            <div class="stat-header">
+                <span class="stat-label">CRITICAL THREATS</span>
+                <span class="stat-icon-bubble" style="background: #fee2e2; color: #b91c1c;">🚨</span>
+            </div>
+            <div class="stat-value" style="color: #b91c1c;">{{ cards.critical_threats }}</div>
+            <div class="stat-sub">
+                <span class="trend-badge trend-down">Risk &gt; 80</span>
+                <span>Critical Cyber Incidents</span>
+            </div>
+        </div>
+
+        <!-- Card 8: Failed Login Attempts -->
+        <div class="stat-card" style="border-left-color: #d97706;">
+            <div class="stat-header">
+                <span class="stat-label">FAILED LOGINS</span>
+                <span class="stat-icon-bubble" style="background: #fef3c7; color: #d97706;">🔒</span>
+            </div>
+            <div class="stat-value" style="color: #d97706;">{{ cards.failed_logins }}</div>
+            <div class="stat-sub">
+                <span class="trend-badge trend-warning">Monitored</span>
+                <span>Auth Failures / Brute-Force</span>
+            </div>
+        </div>
+
+        <!-- Card 9: Emergency Break-Glass Events -->
+        <div class="stat-card" style="border-left-color: #db2777;">
+            <div class="stat-header">
+                <span class="stat-label">BREAK-GLASS EVENTS</span>
+                <span class="stat-icon-bubble" style="background: #fce7f3; color: #db2777;">🏥</span>
+            </div>
+            <div class="stat-value" style="color: #db2777;">{{ cards.emergency_access_events }}</div>
+            <div class="stat-sub">
+                <span class="trend-badge trend-warning">Audited</span>
+                <span>15-min Clinical Overrides</span>
+            </div>
+        </div>
+
+        <!-- Card 10: Insider Threat Alerts -->
+        <div class="stat-card" style="border-left-color: #9333ea;">
+            <div class="stat-header">
+                <span class="stat-label">INSIDER THREAT ALERTS</span>
+                <span class="stat-icon-bubble" style="background: #f3e8ff; color: #9333ea;">👁️</span>
+            </div>
+            <div class="stat-value" style="color: #9333ea;">{{ cards.insider_threat_alerts }}</div>
+            <div class="stat-sub">
+                <span class="trend-badge" style="background: #ede9fe; color: #6d28d9;">Heuristic</span>
+                <span>Bulk Harvesting Alerts</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. CRITICAL HEART PATIENTS SECTION -->
+    <div class="card" style="margin-bottom: 28px;">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">🫀 Critical Heart Patients (Inpatient Monitoring)</h2>
+                <p class="card-subtitle">Active cardiac care registry protected by Risk-Based Access Control and honeypot deception.</p>
+            </div>
+            <a href="{{ url_for('admin.manage_patients') }}" class="btn btn-secondary btn-sm">
+                Manage All Patients &amp; Photos →
+            </a>
+        </div>
+
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="color: #1e40af; font-size: 0.8rem; font-weight: 700;">
+                ⚠️ DEMO DATA – NOT REAL PATIENT INFORMATION • Synthetic Cardiac Registry
+            </span>
+            <span class="badge badge-low" style="font-size: 0.7rem;">RBAC 2.0 PROTECTED</span>
+        </div>
+
+        <div class="profile-card-grid">
+            {% for pat in patient_cards %}
+            <div class="patient-card">
+                <div class="profile-card-badge-pos">
+                    <span class="badge badge-medium" style="background: #fee2e2; color: #991b1b; border-color: #fca5a5;">PATIENT – DEMO</span>
+                </div>
+
+                <div class="profile-card-top">
+                    <img src="{{ patient_photo(pat.profile_photo, False) }}" alt="{{ pat.name }}" class="profile-card-avatar">
+                    <div class="profile-card-info">
+                        <h3>{{ pat.name }}</h3>
+                        <div class="profile-card-meta">
+                            <span style="font-family: var(--font-mono); font-weight: 700; color: #0284c7;">{{ pat.patient_id }}</span>
+                            <span style="margin: 0 4px;">•</span>
+                            <span>Age {{ pat.age }} ({{ pat.gender }})</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.4;">
+                    <div><strong>Assigned Doctor:</strong> <code>{{ pat.assigned_doctor_id }}</code></div>
+                    <div><strong>Condition:</strong> {{ pat.heart_condition_category }}</div>
+                    <div style="display: flex; gap: 6px; margin-top: 6px; align-items: center;">
+                        <span><strong>Record:</strong></span>
+                        <span class="badge {% if pat.record_sensitivity_level == 'HIGHLY_CONFIDENTIAL' %}badge-critical{% elif pat.record_sensitivity_level == 'CONFIDENTIAL' %}badge-medium{% else %}badge-low{% endif %}">
+                            {{ pat.record_sensitivity_level }}
+                        </span>
+                        <span class="badge badge-low">Blood: {{ pat.blood_group }}</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.72rem; color: #059669; font-weight: 600;">● Protected Status</span>
+                    <a href="{{ url_for('patients.patient_detail', patient_id=pat.patient_id) }}" class="btn btn-primary btn-sm">
+                        View Medical Record
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 3. DOCTORS / CLINICIANS SECTION -->
+    <div class="card" style="margin-bottom: 28px;">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">👨‍⚕️ Attending Cardiologists &amp; Medical Staff</h2>
+                <p class="card-subtitle">Vetted clinical physicians with assigned patient authorizations and clearance levels.</p>
+            </div>
+            <a href="{{ url_for('admin.manage_users') }}" class="btn btn-secondary btn-sm">
+                Manage Doctors &amp; Photos →
+            </a>
+        </div>
+
+        <div class="profile-card-grid">
+            {% for doc in doctor_cards %}
+            <div class="doctor-card">
+                <div class="profile-card-badge-pos">
+                    <span class="badge badge-low" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">DOCTOR</span>
+                </div>
+
+                <div class="profile-card-top">
+                    <img src="{{ doctor_photo(doc.profile_photo) }}" alt="{{ doc.name }}" class="profile-card-avatar">
+                    <div class="profile-card-info">
+                        <h3>{{ doc.name }}</h3>
+                        <div class="profile-card-meta">
+                            <span style="font-family: var(--font-mono); font-weight: 700; color: #0284c7;">{{ doc.doctor_id }}</span>
+                            <span style="margin: 0 4px;">•</span>
+                            <span>{{ doc.department }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.45;">
+                    <div><strong>Specialization:</strong> {{ doc.specialization or doc.specialty }}</div>
+                    <div><strong>Qualification:</strong> {{ doc.qualification or 'MBBS, MD Cardiology' }}</div>
+                    <div><strong>Experience:</strong> {{ doc.experience or '8+ Years' }}</div>
+                    <div><strong>Assigned Patients:</strong> <strong style="color: #0284c7;">{{ doc.assigned_count }}</strong></div>
+                </div>
+
+                <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; gap: 4px;">
+                        <span class="badge {% if doc.status == 'active' %}badge-low{% else %}badge-critical{% endif %}">
+                            Status: {{ doc.status|upper }}
+                        </span>
+                        <span class="badge badge-low">
+                            Risk: {{ doc.risk_score }}
+                        </span>
+                    </div>
+                    <span class="badge badge-info" style="font-size: 0.65rem;">
+                        {{ doc.permission_level }}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 4. HOSPITAL TELEMETRY ANALYTICS (7 CHARTS) -->
+    <div class="card" style="margin-bottom: 28px;">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">📊 Live Cybersecurity Telemetry Streams (7 Analytics Engines)</h2>
+                <p class="card-subtitle">Real-time data feeds queried via REST API: <code>/api/security/chart-data</code></p>
+            </div>
+            <span class="badge badge-low">Live Polling Active</span>
+        </div>
+
+        <!-- ROW 1 OF CHARTS: 3 CHARTS -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; margin-bottom: 18px;">
+            <!-- Chart 1: Threats by Severity -->
+            <div style="border: 1px solid var(--border-light); border-radius: 8px; padding: 16px; background: #ffffff;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <strong style="font-size: 0.88rem; color: var(--text-main);">1. Threats by Severity</strong>
+                    <span class="badge badge-critical" style="font-size: 0.65rem;">SEVERITY TIERS</span>
+                </div>
+                <div style="height: 200px; position: relative;">
+                    <canvas id="chartThreatSeverity"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: Login Activity -->
+            <div style="border: 1px solid var(--border-light); border-radius: 8px; padding: 16px; background: #ffffff;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <strong style="font-size: 0.88rem; color: var(--text-main);">2. MFA Login Authentication</strong>
+                    <span class="badge badge-low" style="font-size: 0.65rem;">MFA RATIO</span>
+                </div>
+                <div style="height: 200px; position: relative;">
+                    <canvas id="chartLoginAuth"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 3: Failed Login Trend -->
+            <div style="border: 1px solid var(--border-light); border-radius: 8px; padding: 16px; background: #ffffff;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <strong style="font-size: 0.88rem; color: var(--text-main);">3. Failed Login Attack Trend</strong>
+                    <span class="badge badge-medium" style="font-size: 0.65rem;">TIMELINE</span>
+                </div>
+                <div style="height: 200px; position: relative;">
+                    <canvas id="chartFailedTrend"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 2 OF CHARTS: 4 CHARTS -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+            <!-- Chart 4: Risk Score Distribution -->
+            <div style="border: 1px solid var(--border-light); border-radius: 8px; padding: 14px; background: #ffffff;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong style="font-size: 0.85rem; color: var(--text-main);">4. Dynamic Risk Distribution</strong>
+                    <span class="badge badge-low" style="font-size: 0.62rem;">0 - 100</span>
+                </div>
+                <div style="height: 180px; position: relative;">
+                    <canvas id="chartRiskDist"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 5: Decoy Activity -->
+            <div style="border: 1px solid var(--border-light); border-radius: 8px; padding: 14px; background: #ffffff;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong style="font-size: 0.85rem; color: var(--text-main);">5. Decoy Honeypot Hits</strong>
+                    <span class="badge badge-decoy" style="font-size: 0.62rem;">CANARIES</span>
+                </div>
+                <div style="height: 180px; position: relative;">
+                    <canvas id="chartDecoyActivity"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 6: Access Attempts -->
+            <div style="border: 1px solid var(--border-light); border-radius: 8px; padding: 14px; background: #ffffff;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong style="font-size: 0.85rem; color: var(--text-main);">6. Access Attempt Outcomes</strong>
+                    <span class="badge badge-low" style="font-size: 0.62rem;">ALLOWED vs BLOCKED</span>
+                </div>
+                <div style="height: 180px; position: relative;">
+                    <canvas id="chartAccessAttempts"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 7: Threat Types -->
+            <div style="border: 1px solid var(--border-light); border-radius: 8px; padding: 14px; background: #ffffff;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong style="font-size: 0.85rem; color: var(--text-main);">7. Threat Type Classification</strong>
+                    <span class="badge badge-high" style="font-size: 0.62rem;">HEURISTICS</span>
+                </div>
+                <div style="height: 180px; position: relative;">
+                    <canvas id="chartThreatTypes"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. REAL-TIME ACTIVITY FEEDS -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px;">
+        <!-- RECENT SECURITY ALERTS -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">🚨 Recent Security Threat Alerts</h3>
+                <a href="{{ url_for('security.alerts') }}" style="font-size: 0.8rem; color: var(--primary-blue); text-decoration: none; font-weight: 600;">View All Alerts →</a>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                {% for a in recent_alerts %}
+                <div style="padding: 12px; background: #f8fafc; border-radius: 8px; border: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 0.86rem; font-weight: 700; color: var(--text-main);">
+                            {{ a.threat_type }}
+                        </div>
+                        <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">
+                            Target: <span style="font-family: var(--font-mono); color: var(--primary-blue);">{{ a.user_id }}</span> • {{ a.timestamp }}
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        {% if a.severity == 'CRITICAL' %}
+                            <span class="badge badge-critical">CRITICAL ({{ a.risk_score }})</span>
+                        {% elif a.severity == 'HIGH' %}
+                            <span class="badge badge-high">HIGH ({{ a.risk_score }})</span>
+                        {% elif a.severity == 'MEDIUM' %}
+                            <span class="badge badge-medium">MEDIUM ({{ a.risk_score }})</span>
+                        {% else %}
+                            <span class="badge badge-low">LOW ({{ a.risk_score }})</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div style="color: var(--text-muted); font-size: 0.84rem; padding: 12px;">No security alerts recorded.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- RECENT HONEYPOT DECOY TRAPS -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title" style="color: #7c3aed;">🎭 Honeypot Decoy Traps</h3>
+                <a href="{{ url_for('decoy.decoy_monitor') }}" style="font-size: 0.8rem; color: #7c3aed; text-decoration: none; font-weight: 600;">Decoy Console →</a>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                {% for dec in recent_decoys %}
+                <div style="padding: 12px; background: #faf5ff; border-radius: 8px; border: 1px solid #ddd6fe; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 0.86rem; font-weight: 700; color: #5b21b6;">
+                            Probe: {{ dec.fake_patient_searched or dec.fake_record_viewed or 'Canary Chart' }}
+                        </div>
+                        <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">
+                            IP: {{ dec.ip_address }} • {{ dec.timestamp }}
+                        </div>
+                    </div>
+                    <div>
+                        <span class="badge badge-critical" style="font-size: 0.7rem;">HONEYTOKEN TRAPPED</span>
+                    </div>
+                </div>
+                {% else %}
+                <div style="color: var(--text-muted); font-size: 0.84rem; padding: 12px;">No decoy traps currently active.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- RECENT EMERGENCY BREAK-GLASS AUDITS -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title" style="color: #dc2626;">🚨 Emergency Break-Glass Overrides</h3>
+                <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">15-min Validity</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                {% for emg in recent_emergencies %}
+                <div style="padding: 12px; background: #fff5f5; border-radius: 8px; border: 1px solid #fecaca; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 0.86rem; font-weight: 700; color: #991b1b;">
+                            Doctor: {{ emg.doctor_id }} → Patient: <span style="font-family: var(--font-mono); color: #0284c7;">{{ emg.patient_id }}</span>
+                        </div>
+                        <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">
+                            Reason: {{ emg.reason | truncate(45) }}
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        {% if emg.is_active %}
+                            <span class="badge badge-critical" style="font-size: 0.68rem;">ACTIVE</span>
+                        {% else %}
+                            <span class="badge badge-low" style="font-size: 0.68rem;">EXPIRED</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div style="color: var(--text-muted); font-size: 0.84rem; padding: 12px;">No emergency break-glass incidents recorded.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="decBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1035"/>
+      <stop offset="100%" stop-color="#3b0764"/>
+    </linearGradient>
+    <linearGradient id="decGown" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc"/>
+      <stop offset="100%" stop-color="#9333ea"/>
+    </linearGradient>
+    <linearGradient id="decSkin" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e9d5ff"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Circle -->
+  <circle cx="60" cy="60" r="58" fill="url(#decBg)" stroke="#c084fc" stroke-width="3"/>
+  <!-- Head & Neck -->
+  <circle cx="60" cy="42" r="20" fill="url(#decSkin)"/>
+  <path d="M54 58 L66 58 L66 68 L54 68 Z" fill="url(#decSkin)"/>
+  <!-- Hair / Silhouette -->
+  <path d="M42 36 Q60 18 78 36 Q70 26 60 26 Q50 26 42 36 Z" fill="#581c87"/>
+  <!-- Decoy Body -->
+  <path d="M26 110 C26 80 40 70 50 68 L70 68 C80 70 94 80 94 110 Z" fill="url(#decGown)"/>
+  <!-- Honeytoken Mask/Decoy Badge -->
+  <circle cx="94" cy="26" r="14" fill="#a855f7"/>
+  <text x="94" y="31" font-size="14" text-anchor="middle" fill="#ffffff">🎭</text>
+</svg>
