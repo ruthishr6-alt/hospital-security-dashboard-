@@ -15,7 +15,7 @@
             </div>
 
             <h1 class="hero-title">
-                Protecting Critical Heart Patient Records With <span>Intelligent Cybersecurity</span>
+                Protecting Critical Heart Patient Records 
             </h1>
 
             <p class="hero-desc">
@@ -389,63 +389,54 @@
 </section>
 
 <!-- ====================================================================
-     DOCTORS SECTION
+     QUALIFIED DOCTORS SECTION
      ==================================================================== -->
 <section class="content-section" id="doctors" style="background: #ffffff; border-top: 1px solid var(--border-light);">
     <div class="section-header-center">
         <span class="section-tag"><i class="fa-solid fa-user-doctor"></i> Medical Specialists</span>
-        <h2 class="section-title">Our Qualified Healthcare Professionals</h2>
+        <h2 class="section-title">Qualified Doctors</h2>
         <p class="section-desc">
             Credentialed cardiologists and cardiac care specialists actively managing monitored ICU inpatients.
         </p>
     </div>
 
-    <div class="grid-4" style="gap: 20px;">
+    <div class="qualified-doctors-grid">
         {% for doc in doctors %}
-        <div class="doctor-card">
-            <div class="doctor-card-photo-wrap">
-                <img src="{{ doctor_photo(doc.profile_photo) }}" alt="{{ doc.name }}" class="doctor-card-photo">
-                <span class="doctor-status-badge">● Active</span>
+        <div class="qualified-doctor-card">
+            <!-- 1:1 Perfect Square Doctor Photo with Hospital Frame -->
+            <div class="doctor-square-frame">
+                <img src="{{ doctor_photo(doc.profile_photo) }}" alt="{{ doc.name }}" class="doctor-square-img">
+                <span class="doctor-active-pill"><i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> Active</span>
             </div>
 
-            <h3 class="doctor-card-name">{{ doc.name }}</h3>
-            <div class="doctor-card-spec">{{ doc.specialization or doc.specialty }}</div>
-            <div class="doctor-card-meta">
-                <code>{{ doc.doctor_id }}</code> &bull; {{ doc.department }}
-            </div>
+            <!-- Doctor Information -->
+            <div class="doctor-details-box">
+                <h3 class="doctor-name">{{ doc.name }}</h3>
+                <div class="doctor-specialization">{{ doc.specialization or doc.specialty or 'Cardiologist' }}</div>
 
-            <div class="doctor-card-info-list">
-                <div class="doctor-card-info-item">
-                    <span style="color: var(--text-muted);">Qualification:</span>
-                    <strong style="color: var(--navy-primary);">{{ doc.qualification or 'MBBS, MD Cardiology' }}</strong>
+                <div class="doctor-meta-list">
+                    <div class="doctor-meta-item">
+                        <span class="doctor-meta-label"><i class="fa-solid fa-graduation-cap" style="color: var(--turquoise-primary); font-size: 0.72rem;"></i> Qualification:</span>
+                        <strong class="doctor-meta-value">{{ doc.qualification or 'MBBS, MD' }}</strong>
+                    </div>
+                    <div class="doctor-meta-item">
+                        <span class="doctor-meta-label"><i class="fa-solid fa-clock-rotate-left" style="color: var(--turquoise-primary); font-size: 0.72rem;"></i> Experience:</span>
+                        <strong class="doctor-meta-value">{% if 'Experience' in (doc.experience or '') %}{{ doc.experience }}{% else %}{{ doc.experience or '8 Years' }} Experience{% endif %}</strong>
+                    </div>
+                    <div class="doctor-meta-item">
+                        <span class="doctor-meta-label"><i class="fa-solid fa-hospital-user" style="color: var(--turquoise-primary); font-size: 0.72rem;"></i> Department:</span>
+                        <strong class="doctor-meta-value">{{ doc.department or 'Cardiology Department' }}</strong>
+                    </div>
                 </div>
-                <div class="doctor-card-info-item">
-                    <span style="color: var(--text-muted);">Experience:</span>
-                    <strong style="color: var(--navy-primary);">{{ doc.experience or '8 Years' }}</strong>
-                </div>
-                <div class="doctor-card-info-item">
-                    <span style="color: var(--text-muted);">Assigned Patients:</span>
-                    <strong style="color: var(--turquoise-primary);">{{ doc.patient_count|default(2) }} Patients</strong>
-                </div>
-                <div class="doctor-card-info-item">
-                    <span style="color: var(--text-muted);">Clearance:</span>
-                    <span class="badge {% if doc.permission_level == 'HIGHLY_CONFIDENTIAL' %}badge-high{% elif doc.permission_level == 'CONFIDENTIAL' %}badge-medium{% else %}badge-low{% endif %}" style="font-size: 0.65rem;">
-                        {{ doc.permission_level }}
-                    </span>
-                </div>
-            </div>
 
-            <!-- Contact icons -->
-            <div style="display: flex; justify-content: center; gap: 8px; margin-top: auto;">
-                <a href="mailto:{{ doc.user_email or doc.email }}" class="btn btn-secondary btn-sm" style="width: 32px; height: 32px; border-radius: 50%; padding: 0;" title="Email Clinician">
-                    <i class="fa-solid fa-envelope" style="font-size: 0.75rem;"></i>
-                </a>
-                <a href="tel:{{ doc.demo_phone or '+15550192834' }}" class="btn btn-secondary btn-sm" style="width: 32px; height: 32px; border-radius: 50%; padding: 0;" title="Call Demo Phone">
-                    <i class="fa-solid fa-phone" style="font-size: 0.75rem;"></i>
-                </a>
-                <a href="#secure-access" class="btn btn-primary btn-sm" style="font-size: 0.74rem; padding: 4px 10px;" onclick="setCredentials('{{ doc.username }}', 'DoctorDemo#2026!', 'DEV-DOC01-TRUSTED')">
-                    Login As &rarr;
-                </a>
+                <!-- Card Action (Preserve Fast Login) -->
+                {% if doc.username %}
+                <div class="doctor-card-action">
+                    <a href="#secure-access" class="doctor-login-btn" onclick="setCredentials('{{ doc.username }}', 'DoctorDemo#2026!', '{{ doc.trusted_device_id or 'DEV-DOC01-TRUSTED' }}')">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Login As
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
         {% endfor %}

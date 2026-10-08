@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Patient - {{ patient.name }} ({{ patient.patient_id }}) | CardioShield{% endblock %}
+
+{% block content %}
+<div class="content-header" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div>
+            <span class="badge badge-info" style="font-size: 0.75rem; text-transform: uppercase;">
+                <i class="fa-solid fa-hospital-user"></i> Medical Chart Maintenance
+            </span>
+            <h1 style="font-size: 1.85rem; font-weight: 900; color: var(--navy-primary); margin: 6px 0 2px;">
+                Edit Patient Record: {{ patient.name }}
+            </h1>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">
+                Patient ID: <code>{{ patient.patient_id }}</code> &bull; Condition: {{ patient.heart_condition_category }}
+            </p>
+        </div>
+
+        <a href="{{ url_for('patients.patient_detail', patient_id=patient.patient_id) }}" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-arrow-left"></i> Cancel &amp; Return to Chart
+        </a>
+    </div>
+</div>
+
+<div style="max-width: 860px; margin: 0 auto 50px;">
+    <form method="POST" action="{{ url_for('cardioshield.patient_edit', patient_id=patient.patient_id) }}" enctype="multipart/form-data" class="content-card" style="padding: 32px;">
+        <!-- Photo Update Box -->
+        <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 28px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+            <div style="width: 130px; height: 130px; border-radius: 10px; overflow: hidden; border: 2px solid #cbd5e1; background: #fee2e2; flex-shrink: 0; box-shadow: var(--shadow-sm); position: relative;">
+                <img id="photoPreview" src="{{ patient_photo(patient.profile_photo, False) }}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1 / 1; display: block;">
+            </div>
+
+            <div style="flex: 1; min-width: 260px;">
+                <label class="form-label" style="font-weight: 800; color: var(--navy-primary); margin-bottom: 4px;">
+                    <i class="fa-solid fa-camera" style="color: var(--turquoise-primary);"></i> Patient Photo (1:1 Square)
+                </label>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 12px;">
+                    Allowed: <strong>JPG, JPEG, PNG, WEBP</strong> (Max size: 5 MB).
+                </p>
+
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <label for="profilePhotoInput" class="btn btn-primary btn-sm" style="cursor: pointer; margin-bottom: 0;">
+                        <i class="fa-solid fa-upload"></i> Change Photo
+                    </label>
+                    <input type="file" id="profilePhotoInput" name="profile_photo" accept=".jpg,.jpeg,.png,.webp" style="display: none;" onchange="handlePhotoSelect(this)">
+                    
+                    {% if patient.profile_photo %}
+                    <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--red-critical); cursor: pointer; margin-bottom: 0;">
+                        <input type="checkbox" name="remove_photo" value="1">
+                        <i class="fa-solid fa-trash-can"></i> Remove Photo (Use Default)
+                    </label>
+                    {% endif %}
+                    <span id="fileNameLabel" style="font-size: 0.8rem; color: var(--text-muted);">Current: {{ patient.profile_photo or 'Default Avatar' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Demographics -->
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--navy-primary); margin-bottom: 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-id-card" style="color: var(--turquoise-primary);"></i> Patient Demographics
+        </h3>
+
+        <div class="grid-2" style="gap: 18px; margin-bottom: 18px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="patName">Full Name *</label>
+                <input type="text" id="patName" name="name" class="form-control" value="{{ patient.name }}" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Patient ID</label>
+                <input type="text" class="form-control" value="{{ patient.patient_id }}" disabled>
+            </div>
+        </div>
+
+        <div class="grid-3" style="gap: 18px; margin-bottom: 18px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="patAge">Age *</label>
+                <input type="number" id="patAge" name="age" class="form-control" min="1" max="120" value="{{ patient.age }}" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="patGender">Gender</label>
+                <select id="patGender" name="gender" class="form-control">
+                    <option value="Male" {% if patient.gender == 'Male' %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if patient.gender == 'Female' %}selected{% endif %}>Female</option>
+                    <option value="Other" {% if patient.gender == 'Other' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="patBlood">Blood Group</label>
+                <select id="patBlood" name="blood_group" class="form-control">
+                    {% for bg in ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'] %}
+                    <option value="{{ bg }}" {% if patient.blood_group == bg %}selected{% endif %}>{{ bg }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Section 2: Clinical Details -->
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--navy-primary); margin: 28px 0 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-stethoscope" style="color: var(--turquoise-primary);"></i> Clinical Details &amp; Physician Assignment
+        </h3>
+
+        <div class="grid-2" style="gap: 18px; margin-bottom: 18px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="heartCond">Heart Condition Category</label>
+                <input type="text" id="heartCond" name="heart_condition_category" class="form-control" value="{{ patient.heart_condition_category }}" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="assignedDoc">Assigned Attending Doctor</label>
+                <select id="assignedDoc" name="assigned_doctor_id" class="form-control">
+                    {% for doc in doctors %}
+                    <option value="{{ doc.doctor_id }}" {% if patient.assigned_doctor_id == doc.doctor_id %}selected{% endif %}>
+                        {{ doc.name }} ({{ doc.doctor_id }} - {{ doc.department }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 18px;">
+            <label class="form-label" for="medHistory">Synthetic Medical History</label>
+            <textarea id="medHistory" name="medical_history" class="form-control" rows="3">{{ patient.medical_history }}</textarea>
+        </div>
+
+        <!-- Section 3: Contact & Emergency -->
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--navy-primary); margin: 28px 0 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-phone" style="color: var(--turquoise-primary);"></i> Emergency &amp; Security Tiers
+        </h3>
+
+        <div class="grid-2" style="gap: 18px; margin-bottom: 18px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="emergencyContact">Emergency Contact *</label>
+                <input type="text" id="emergencyContact" name="emergency_contact" class="form-control" value="{{ patient.emergency_contact }}" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="patPhone">Phone Number</label>
+                <input type="text" id="patPhone" name="phone_number" class="form-control" value="{{ patient.phone_number or '+1 (555) 019-1001' }}">
+            </div>
+        </div>
+
+        <div class="grid-2" style="gap: 18px; margin-bottom: 24px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="recSens">Record Sensitivity Level</label>
+                <select id="recSens" name="record_sensitivity_level" class="form-control">
+                    <option value="NORMAL" {% if patient.record_sensitivity_level == 'NORMAL' %}selected{% endif %}>NORMAL</option>
+                    <option value="CONFIDENTIAL" {% if patient.record_sensitivity_level == 'CONFIDENTIAL' %}selected{% endif %}>CONFIDENTIAL</option>
+                    <option value="HIGHLY_CONFIDENTIAL" {% if patient.record_sensitivity_level == 'HIGHLY_CONFIDENTIAL' %}selected{% endif %}>HIGHLY_CONFIDENTIAL</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="status">Admission / Access Status</label>
+                <select id="status" name="status" class="form-control">
+                    <option value="active" {% if patient.status == 'active' %}selected{% endif %}>Active Inpatient</option>
+                    <option value="disabled" {% if patient.status == 'disabled' %}selected{% endif %}>Discharged / Inactive</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <a href="{{ url_for('patients.patient_detail', patient_id=patient.patient_id) }}" class="btn btn-secondary">
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-primary btn-lg" style="min-width: 180px;">
+                <i class="fa-solid fa-floppy-disk"></i> Update Patient Record
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+function handlePhotoSelect(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        if (file.size > 5 * 1024 * 1024) {
+            alert("File size exceeds 5MB limit.");
+            input.value = "";
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('photoPreview').src = e.target.result;
+            document.getElementById('fileNameLabel').textContent = file.name;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+</script>
+{% endblock %}

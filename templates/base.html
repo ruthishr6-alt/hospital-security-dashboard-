@@ -47,63 +47,68 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{% if session.get('role') == 'admin' %}{{ url_for('admin.dashboard') }}{% elif session.get('role') == 'doctor' %}{{ url_for('doctor.dashboard') }}{% else %}{{ url_for('auth.login') }}{% endif %}" class="nav-link {% if 'dashboard' in request.path %}active{% endif %}">
+                        <a href="{{ url_for('cardioshield.dashboard') }}" class="nav-link {% if 'dashboard' in request.path %}active{% endif %}">
                             <i class="fa-solid fa-chart-line"></i> Dashboard
                         </a>
                     </li>
                     <li>
-                        <a href="{% if session.get('role') == 'admin' %}{{ url_for('admin.manage_users') }}{% else %}{{ url_for('home') }}#doctors{% endif %}" class="nav-link {% if 'users' in request.path %}active{% endif %}">
+                        <a href="{{ url_for('cardioshield.doctor_list') }}" class="nav-link {% if '/doctor' in request.path %}active{% endif %}">
                             <i class="fa-solid fa-user-doctor"></i> Doctors
                         </a>
                     </li>
                     <li>
                         <a href="{{ url_for('patients.patient_list') }}" class="nav-link {% if '/patient' in request.path %}active{% endif %}">
-                            <i class="fa-solid fa-heart-pulse"></i> Heart Patients
+                            <i class="fa-solid fa-heart-pulse"></i> Patients
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url_for('doctor.medical_records_view') }}" class="nav-link {% if 'records' in request.path %}active{% endif %}">
+                        <a href="{{ url_for('cardioshield.medical_records_view') }}" class="nav-link {% if 'medical-records' in request.path or 'records' in request.path %}active{% endif %}">
                             <i class="fa-solid fa-notes-medical"></i> Medical Records
                         </a>
                     </li>
-                    <!-- Security Dropdown -->
+                    <!-- Security Dropdown with 9 Dedicated Pages -->
                     <li class="nav-dropdown">
-                        <a href="javascript:void(0)" class="nav-link {% if 'security' in request.path or 'decoy' in request.path %}active{% endif %}">
+                        <a href="javascript:void(0)" class="nav-link {% if 'security' in request.path or 'decoy' in request.path or 'threat' in request.path or 'audit' in request.path or 'break-glass' in request.path or 'risk' in request.path %}active{% endif %}">
                             <i class="fa-solid fa-shield-halved"></i> Security <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; margin-left: 2px;"></i>
                         </a>
                         <div class="dropdown-menu">
-                            <a href="{{ url_for('admin.dashboard') }}" class="dropdown-item">
-                                <i class="fa-solid fa-chart-line"></i> SOC Dashboard
+                            <a href="{{ url_for('cardioshield.advanced_security') }}" class="dropdown-item">
+                                <i class="fa-solid fa-shield-halved"></i> Advanced Healthcare Security
                             </a>
-                            <a href="{{ url_for('security.alerts') }}" class="dropdown-item">
-                                <i class="fa-solid fa-triangle-exclamation"></i> Security Incident Alerts
-                            </a>
-                            <a href="{{ url_for('security.threat_monitor') }}" class="dropdown-item">
-                                <i class="fa-solid fa-satellite-dish"></i> Threat Telemetry &amp; IDS
-                            </a>
-                            <a href="{{ url_for('decoy.decoy_catalog') }}" class="dropdown-item">
-                                <i class="fa-solid fa-masks-theater"></i> Decoy Sandbox &amp; Canaries
-                            </a>
-                            <a href="{{ url_for('security.audit_logs') }}" class="dropdown-item">
-                                <i class="fa-solid fa-file-shield"></i> Tamper-Evident Audit Logs
-                            </a>
-                            <a href="{{ url_for('security.device_security') }}" class="dropdown-item">
-                                <i class="fa-solid fa-laptop-medical"></i> Hardware Device Security
+                            <a href="{{ url_for('cardioshield.security_alerts_view') }}" class="dropdown-item">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Security Alerts
                             </a>
                             <a href="{{ url_for('security.risk_analysis') }}" class="dropdown-item">
-                                <i class="fa-solid fa-bolt"></i> Cyber Attack Simulator
+                                <i class="fa-solid fa-scale-balanced"></i> Risk Analysis
                             </a>
-                            <a href="{{ url_for('doctor.confidential_records_view') }}" class="dropdown-item">
-                                <i class="fa-solid fa-vault"></i> Confidential Records Vault
+                            <a href="{{ url_for('cardioshield.threat_monitoring_view') }}" class="dropdown-item">
+                                <i class="fa-solid fa-satellite-dish"></i> Threat Monitoring
                             </a>
-                            <a href="{{ url_for('doctor.emergency_access') }}" class="dropdown-item">
-                                <i class="fa-solid fa-kit-medical"></i> Emergency Break-Glass Access
+                            <a href="{{ url_for('cardioshield.decoy_environment_view') }}" class="dropdown-item">
+                                <i class="fa-solid fa-masks-theater"></i> Decoy Environment
+                            </a>
+                            <a href="{{ url_for('cardioshield.decoy_monitor_view') }}" class="dropdown-item">
+                                <i class="fa-solid fa-radar"></i> Decoy Activity Monitor
+                            </a>
+                            <a href="{{ url_for('cardioshield.audit_logs_view') }}" class="dropdown-item">
+                                <i class="fa-solid fa-file-shield"></i> Audit Logs
+                            </a>
+                            <a href="{{ url_for('cardioshield.device_security_view') }}" class="dropdown-item">
+                                <i class="fa-solid fa-laptop-medical"></i> Device Security
+                            </a>
+                            <a href="{{ url_for('cardioshield.break_glass_view') }}" class="dropdown-item">
+                                <i class="fa-solid fa-kit-medical"></i> Emergency Break-Glass
                             </a>
                         </div>
                     </li>
                     <li>
                         <a href="{{ url_for('home') }}#about" class="nav-link">
                             <i class="fa-solid fa-circle-info"></i> About
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% if current_user %}{{ url_for('auth.profile') }}{% else %}{{ url_for('auth.login') }}{% endif %}" class="nav-link {% if 'profile' in request.path %}active{% endif %}">
+                            <i class="fa-solid fa-id-card"></i> Profile
                         </a>
                     </li>
                 </ul>
@@ -182,12 +187,13 @@
         <div id="mobileDrawer" style="display: none; background: #ffffff; border-top: 1px solid var(--border-light); padding: 16px 24px;">
             <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px;">
                 <li><a href="{{ url_for('home') }}" class="nav-link"><i class="fa-solid fa-house-medical"></i> Home</a></li>
-                <li><a href="{% if session.get('role') == 'admin' %}{{ url_for('admin.dashboard') }}{% elif session.get('role') == 'doctor' %}{{ url_for('doctor.dashboard') }}{% else %}{{ url_for('auth.login') }}{% endif %}" class="nav-link"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
-                <li><a href="{% if session.get('role') == 'admin' %}{{ url_for('admin.manage_users') }}{% else %}{{ url_for('home') }}#doctors{% endif %}" class="nav-link"><i class="fa-solid fa-user-doctor"></i> Doctors</a></li>
-                <li><a href="{{ url_for('patients.patient_list') }}" class="nav-link"><i class="fa-solid fa-heart-pulse"></i> Heart Patients</a></li>
-                <li><a href="{{ url_for('doctor.medical_records_view') }}" class="nav-link"><i class="fa-solid fa-notes-medical"></i> Medical Records</a></li>
-                <li><a href="{{ url_for('security.alerts') }}" class="nav-link"><i class="fa-solid fa-shield-halved"></i> Security Center</a></li>
+                <li><a href="{{ url_for('cardioshield.dashboard') }}" class="nav-link"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('cardioshield.doctor_list') }}" class="nav-link"><i class="fa-solid fa-user-doctor"></i> Doctors</a></li>
+                <li><a href="{{ url_for('patients.patient_list') }}" class="nav-link"><i class="fa-solid fa-heart-pulse"></i> Patients</a></li>
+                <li><a href="{{ url_for('cardioshield.medical_records_view') }}" class="nav-link"><i class="fa-solid fa-notes-medical"></i> Medical Records</a></li>
+                <li><a href="{{ url_for('cardioshield.security_alerts_view') }}" class="nav-link"><i class="fa-solid fa-shield-halved"></i> Security Center</a></li>
                 <li><a href="{{ url_for('home') }}#about" class="nav-link"><i class="fa-solid fa-circle-info"></i> About</a></li>
+                <li><a href="{% if current_user %}{{ url_for('auth.profile') }}{% else %}{{ url_for('auth.login') }}{% endif %}" class="nav-link"><i class="fa-solid fa-id-card"></i> Profile</a></li>
                 {% if current_user %}
                 <li><a href="{{ url_for('auth.logout') }}" class="nav-link" style="color: var(--red-critical);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
                 {% endif %}

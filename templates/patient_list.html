@@ -1,138 +1,172 @@
 {% extends "base.html" %}
 
-{% block title %}Inpatient Cardiac Registry | Critical Heart Patient Security{% endblock %}
+{% block title %}Critical Heart Patients Registry - CardioShield{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 28px;">
-    <!-- HEADER -->
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+<div class="content-header" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
         <div>
-            <h1 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 10px;">
-                🫀 Inpatient Cardiac Registry &amp; Patient Directory
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <span class="badge badge-info" style="font-size: 0.75rem; text-transform: uppercase;">
+                    <i class="fa-solid fa-heart-pulse"></i> Clinical Cardiology Directory
+                </span>
+                <span class="badge badge-low" style="font-size: 0.72rem;">
+                    Zero-Trust Shield Active
+                </span>
+            </div>
+            <h1 style="font-size: 1.85rem; font-weight: 900; color: var(--navy-primary); margin: 0;">
+                Critical Heart Patients Directory
             </h1>
-            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
-                {% if user.role == 'admin' %}
-                    Executive administrative oversight of all protected synthetic cardiac patient charts.
-                {% else %}
-                    Authorized critical cardiac roster for Doctor ID: <code>{{ doctor.doctor_id if doctor else 'D001' }}</code>.
-                {% endif %}
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin: 4px 0 0;">
+                Monitored cardiovascular ICU inpatients &bull; Synthetic electronic medical records
             </p>
         </div>
 
-        <form action="{{ url_for('patients.patient_list') }}" method="GET" style="display: flex; gap: 8px;">
-            <input type="text" name="q" class="form-control" placeholder="Search by name, ID, or condition..." value="{{ query_str or '' }}" style="width: 280px; padding: 8px 14px; font-size: 0.85rem;">
-            <button type="submit" class="btn btn-primary btn-sm">Filter Roster</button>
-            {% if query_str %}
-                <a href="{{ url_for('patients.patient_list') }}" class="btn btn-secondary btn-sm">Clear</a>
-            {% endif %}
-        </form>
-    </div>
-
-    <!-- MANDATORY SYNTHETIC DATA NOTICE -->
-    <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <span style="color: #1e40af; font-size: 0.84rem; font-weight: 700;">
-            ⚠️ DEMO DATA – NOT REAL PATIENT INFORMATION • Academic Cybersecurity Prototype
-        </span>
-        <span class="badge badge-low" style="font-size: 0.72rem;">
-            RBAC + Honeypot Decoy Shield Active
-        </span>
-    </div>
-
-    <!-- PATIENT ROSTER TABLE -->
-    <div class="card">
-        <div class="card-header">
-            <div>
-                <h2 class="card-title">📋 Inpatient Cardiac Registry ({{ patients | length }} Records)</h2>
-                <p class="card-subtitle">Zero-Trust Protected Health Data Architecture</p>
-            </div>
-            <span class="badge badge-low">Access: Authorized</span>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a href="{{ url_for('cardioshield.patient_create') }}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">
+                <i class="fa-solid fa-user-plus"></i> + Create New Patient
+            </a>
+            <a href="{{ url_for('cardioshield.medical_records_view') }}" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-notes-medical"></i> Secure Access EMR
+            </a>
+            <a href="{{ url_for('cardioshield.dashboard') }}" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-chart-line"></i> Dashboard
+            </a>
         </div>
+    </div>
+</div>
 
-        <div class="table-responsive">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Patient</th>
-                        <th>Patient ID</th>
-                        <th>Age / Sex</th>
-                        <th>Blood</th>
-                        <th>Cardiac Condition Category</th>
-                        <th>Sensitivity Tier</th>
-                        <th>Telemetry Vitals</th>
-                        <th>Assigned Doctor</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for p in patients %}
-                    <tr>
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <img src="{{ patient_photo(p.profile_photo, False) }}" alt="{{ p.name }}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #ef4444; flex-shrink: 0; background: #fee2e2;">
-                                <div>
-                                    <div style="font-weight: 700; color: var(--text-main); font-size: 0.88rem;">{{ p.name }}</div>
-                                    <span class="badge badge-medium" style="font-size: 0.58rem; padding: 1px 5px; background: #fee2e2; color: #991b1b; border-color: #fca5a5;">PATIENT – DEMO</span>
-                                </div>
+<!-- Search & Synthetic Notice Bar -->
+<div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 18px 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <form method="GET" action="{{ url_for('patients.patient_list') }}" style="display: flex; gap: 10px; flex: 1; max-width: 480px;">
+        <div style="position: relative; flex: 1;">
+            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+            <input type="text" name="q" value="{{ query_str or '' }}" placeholder="Search by patient name, ID, or condition..." class="form-control" style="padding-left: 38px; margin-bottom: 0;">
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">
+            <i class="fa-solid fa-filter"></i> Search
+        </button>
+        {% if query_str %}
+        <a href="{{ url_for('patients.patient_list') }}" class="btn btn-secondary btn-sm">Clear</a>
+        {% endif %}
+    </form>
+
+    <div style="background: #f0fdfa; border: 1px solid #b2ebf2; padding: 6px 14px; border-radius: 8px; font-size: 0.78rem; color: #007799; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+        <i class="fa-solid fa-shield-halved"></i> SYNTHETIC DEMO MEDICAL DATA &bull; ZERO REAL PHI
+    </div>
+</div>
+
+<!-- Patients Roster Table -->
+<div class="content-card" style="padding: 0; overflow: hidden; margin-bottom: 40px;">
+    <div style="padding: 18px 24px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; background: #fafbfc;">
+        <div>
+            <h2 style="font-size: 1.05rem; font-weight: 800; color: var(--navy-primary); margin: 0;">
+                Patient Roster ({{ patients|length }} Active Cases)
+            </h2>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">Access strictly authorized by attending cardiologist assignment</span>
+        </div>
+        <span class="badge badge-low" style="font-size: 0.72rem;">Role: {{ current_user.role|upper if current_user else 'EVALUATOR' }}</span>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="table" style="margin-bottom: 0;">
+            <thead>
+                <tr>
+                    <th>PATIENT</th>
+                    <th>PATIENT ID</th>
+                    <th>AGE / GENDER</th>
+                    <th>BLOOD GROUP</th>
+                    <th>ASSIGNED DOCTOR</th>
+                    <th>HEART CONDITION</th>
+                    <th>RECORD SENSITIVITY</th>
+                    <th>STATUS</th>
+                    <th style="text-align: right;">CLINICAL ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in patients %}
+                <tr>
+                    <!-- Photo & Name -->
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 48px; height: 48px; border-radius: 8px; overflow: hidden; border: 1.5px solid #e2e8f0; background: #fee2e2; flex-shrink: 0;">
+                                <img src="{{ patient_photo(p.profile_photo, False) }}" alt="{{ p.name }}" style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1 / 1; display: block;">
                             </div>
-                        </td>
-                        <td>
-                            <span style="font-family: var(--font-mono); font-weight: 700; color: #0284c7;">
-                                {{ p.patient_id }}
-                            </span>
-                        </td>
-                        <td style="color: var(--text-secondary);">
-                            <div>{{ p.age }} yrs / {{ p.gender }}</div>
-                            <div style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px;">
-                                <i class="fa-solid fa-phone" style="font-size: 0.68rem; color: var(--turquoise-primary);"></i>
-                                {% if current_user and (current_user.role == 'admin' or current_user.doctor_id == p.assigned_doctor_id) %}
-                                    {{ p.phone_number or '+1 (555) 019-1001' }}
-                                {% else %}
+                            <div>
+                                <a href="{{ url_for('patients.patient_detail', patient_id=p.patient_id) }}" style="font-weight: 800; color: var(--navy-primary); text-decoration: none; font-size: 0.92rem; display: block;">
+                                    {{ p.name }}
+                                </a>
+                                <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">
                                     {{ mask_phone(p.phone_number) }}
-                                {% endif %}
+                                </span>
                             </div>
-                        </td>
-                        <td><span class="badge badge-low">{{ p.blood_group }}</span></td>
-                        <td>
-                            <span class="badge" style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; font-size: 0.72rem;">
-                                {{ p.heart_condition_category }}
-                            </span>
-                        </td>
-                        <td>
-                            {% if p.record_sensitivity_level == 'HIGHLY_CONFIDENTIAL' %}
-                                <span class="badge badge-critical">HIGHLY CONFIDENTIAL</span>
-                            {% elif p.record_sensitivity_level == 'CONFIDENTIAL' %}
-                                <span class="badge badge-medium">CONFIDENTIAL</span>
-                            {% else %}
-                                <span class="badge badge-low">NORMAL</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% set v = format_vitals(p.vitals) %}
-                            <span style="font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600; color: var(--navy-primary); display: inline-flex; align-items: center; gap: 4px;">
-                                <i class="fa-solid fa-heart-pulse" style="color: #ef4444; font-size: 0.72rem;"></i> {{ v.summary }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="user-role-tag">
-                                {{ p.assigned_doctor_id }}
-                            </span>
-                        </td>
-                        <td>
-                            <a href="{{ url_for('patients.patient_detail', patient_id=p.patient_id) }}" class="btn btn-primary btn-sm">
-                                View Medical Record →
-                            </a>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="9" style="text-align: center; padding: 40px; color: var(--text-muted);">
-                            No patients found matching your search criteria.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                        </div>
+                    </td>
+
+                    <!-- Patient ID -->
+                    <td>
+                        <code style="font-size: 0.82rem; font-weight: 700; color: var(--turquoise-primary);">{{ p.patient_id }}</code>
+                    </td>
+
+                    <!-- Age / Gender -->
+                    <td style="color: var(--text-secondary); font-size: 0.85rem;">
+                        <strong>{{ p.age }}</strong> yrs &bull; {{ p.gender }}
+                    </td>
+
+                    <!-- Blood Group -->
+                    <td>
+                        <span class="badge badge-low" style="font-weight: 700;">{{ p.blood_group }}</span>
+                    </td>
+
+                    <!-- Assigned Doctor -->
+                    <td>
+                        <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.84rem; color: var(--navy-primary); font-weight: 600;">
+                            <i class="fa-solid fa-user-doctor" style="color: var(--turquoise-primary); font-size: 0.75rem;"></i>
+                            {{ p.assigned_doctor_name or p.assigned_doctor_id }}
+                        </span>
+                    </td>
+
+                    <!-- Heart Condition Category -->
+                    <td>
+                        <span class="badge" style="background: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5; font-size: 0.74rem; font-weight: 700;">
+                            {{ p.heart_condition_category }}
+                        </span>
+                    </td>
+
+                    <!-- Record Sensitivity -->
+                    <td>
+                        <span class="badge {% if p.record_sensitivity_level == 'HIGHLY_CONFIDENTIAL' %}badge-high{% elif p.record_sensitivity_level == 'CONFIDENTIAL' %}badge-medium{% else %}badge-low{% endif %}" style="font-size: 0.68rem;">
+                            {{ p.record_sensitivity_level }}
+                        </span>
+                    </td>
+
+                    <!-- Access Status -->
+                    <td>
+                        <span class="badge {% if p.status == 'active' %}badge-low{% else %}badge-critical{% endif %}" style="font-size: 0.68rem;">
+                            ● {{ p.status|upper }}
+                        </span>
+                    </td>
+
+                    <!-- Actions -->
+                    <td style="text-align: right; white-space: nowrap;">
+                        <a href="{{ url_for('patients.patient_detail', patient_id=p.patient_id) }}" class="btn btn-primary btn-sm" style="font-size: 0.75rem; padding: 5px 12px;">
+                            View Chart &rarr;
+                        </a>
+                        <a href="{{ url_for('cardioshield.patient_edit', patient_id=p.patient_id) }}" class="btn btn-secondary btn-sm" style="padding: 5px 8px;" title="Edit Patient Profile">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" style="text-align: center; padding: 48px; color: var(--text-muted);">
+                        <i class="fa-solid fa-heart-crack" style="font-size: 2.2rem; color: #cbd5e1; margin-bottom: 10px; display: block;"></i>
+                        No critical heart patients matched your query.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

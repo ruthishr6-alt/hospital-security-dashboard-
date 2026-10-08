@@ -1,88 +1,312 @@
 {% extends "base.html" %}
 
-{% block title %}Medical Records Archive - {{ SYSTEM_NAME }}{% endblock %}
+{% block title %}Medical Records - Secure Access Pipeline | CardioShield{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 24px;">
-    <!-- HEADER -->
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 20px;">
+<div class="content-header" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
         <div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <h1 style="font-size: 1.6rem; font-weight: 800; color: var(--navy-primary); display: flex; align-items: center; gap: 10px;">
-                    <i class="fa-solid fa-notes-medical" style="color: var(--navy-accent);"></i> Clinical Medical Records Archive
-                </h1>
-                <span class="badge badge-low" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;">Tamper-Audited</span>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <span class="badge badge-info" style="font-size: 0.75rem; text-transform: uppercase;">
+                    <i class="fa-solid fa-notes-medical"></i> Clinical EMR Repository
+                </span>
+                <span class="badge badge-low" style="font-size: 0.72rem;">
+                    6-Step Multi-Stage Security Pipeline
+                </span>
             </div>
-            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
-                Chronological repository of progress notes, catheterization reports, and surgical telemetry.
+            <h1 style="font-size: 1.85rem; font-weight: 900; color: var(--navy-primary); margin: 0;">
+                Medical Records: Secure Access Engine
+            </h1>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin: 4px 0 0;">
+                Zero-Trust patient record retrieval with automated threat detection and decoy containment
             </p>
         </div>
 
-        <a href="{{ url_for('patients.patient_list') }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-users"></i> Return to Patient Registry
-        </a>
-    </div>
-
-    <div class="card" style="box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid var(--border-light);">
-        <div class="card-header" style="background: #f8fafc; border-bottom: 1px solid var(--border-light); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-clipboard-list" style="color: var(--navy-accent);"></i>
-                <span class="card-title" style="font-size: 1.05rem; font-weight: 700; color: var(--navy-primary);">Clinical Entries ({{ records|length }} notes)</span>
-            </div>
-            <span class="badge badge-low" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">Security: RBAC Protected</span>
-        </div>
-
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Timestamp</th>
-                        <th>Patient ID / Name</th>
-                        <th>Record Type</th>
-                        <th>Clinical Progress &amp; Observations</th>
-                        <th>Attending Cardiologist</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for r in records %}
-                    <tr>
-                        <td style="font-family: var(--font-mono); font-size: 0.76rem; color: var(--text-muted); white-space: nowrap;">
-                            {{ r.created_at }}
-                        </td>
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <img src="{{ patient_photo(r.patient_photo, False) }}" alt="{{ r.patient_name }}" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #ef4444; flex-shrink: 0;">
-                                <div>
-                                    <strong style="color: var(--navy-primary); font-size: 0.88rem;">{{ r.patient_name }}</strong>
-                                    <div style="display: flex; align-items: center; gap: 4px; margin-top: 2px;">
-                                        <span class="badge" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-size: 0.65rem; padding: 1px 5px; font-family: var(--font-mono); font-weight: 700;">
-                                            {{ r.patient_id }}
-                                        </span>
-                                        <span class="badge" style="font-size: 0.6rem; padding: 1px 4px; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; font-weight: 700;">DEMO</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge badge-low" style="font-weight: 600;">{{ r.record_type }}</span>
-                        </td>
-                        <td style="font-size: 0.84rem; color: var(--navy-primary); max-width: 440px; line-height: 1.45;">
-                            {{ r.clinical_notes }}
-                        </td>
-                        <td style="font-size: 0.82rem; color: var(--text-muted);">
-                            <span style="font-weight: 600; color: var(--navy-primary);">{{ r.doctor_name or r.recorded_by_doctor_id }}</span>
-                        </td>
-                        <td>
-                            <a href="{{ url_for('patients.patient_detail', patient_id=r.patient_id) }}" class="btn btn-primary btn-sm" style="font-size: 0.78rem; padding: 5px 10px; display: inline-flex; align-items: center; gap: 4px;">
-                                View Chart <i class="fa-solid fa-arrow-right" style="font-size: 0.7rem;"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a href="{{ url_for('patients.patient_list') }}" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-heart-pulse"></i> Patient Directory
+            </a>
+            <a href="{{ url_for('cardioshield.dashboard') }}" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-chart-line"></i> Dashboard
+            </a>
         </div>
     </div>
 </div>
+
+<!-- MANDATORY SYNTHETIC DATA NOTICE -->
+<div style="background: #f0fdfa; border: 1px solid #b2ebf2; border-left: 4px solid var(--turquoise-primary); padding: 14px 18px; border-radius: 8px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+    <strong style="color: #007799; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+        <i class="fa-solid fa-shield-halved"></i> SYNTHETIC DEMO MEDICAL DATA &bull; ZERO REAL PATIENT INFORMATION
+    </strong>
+    <span style="font-size: 0.78rem; color: var(--text-muted);">
+        Academic Healthcare Cybersecurity Evaluation Station
+    </span>
+</div>
+
+<!-- ====================================================================
+     SECURE ACCESS PATIENT SELECTOR & CONTROLS
+     ==================================================================== -->
+<div class="content-card" style="padding: 24px; margin-bottom: 28px;">
+    <h2 style="font-size: 1.15rem; font-weight: 800; color: var(--navy-primary); margin: 0 0 14px; display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-lock" style="color: var(--turquoise-primary);"></i> Secure Access Verification Portal
+    </h2>
+
+    <form method="GET" action="{{ url_for('cardioshield.medical_records_view') }}" style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 280px;">
+            <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: var(--navy-primary); margin-bottom: 4px;">
+                Select Patient Record to Inspect:
+            </label>
+            <select name="patient_id" class="form-control" style="margin-bottom: 0;">
+                {% for p in all_patients %}
+                <option value="{{ p.patient_id }}" {% if selected_patient_id == p.patient_id %}selected{% endif %}>
+                    {{ p.patient_id }} - {{ p.name }} ({{ p.heart_condition_category }} &bull; Sensitivity: {{ p.record_sensitivity_level }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+            <button type="submit" class="btn btn-primary" style="padding: 9px 18px; font-weight: 700;">
+                <i class="fa-solid fa-shield-check"></i> Evaluate Access Pipeline
+            </button>
+            {% if patient %}
+            <a href="{{ url_for('patients.patient_detail', patient_id=patient.patient_id) }}" class="btn btn-secondary" style="padding: 9px 14px;" title="Open Dedicated EHR View">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Full EHR
+            </a>
+            {% endif %}
+        </div>
+    </form>
+
+    <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-light); font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <span>
+            Active Context: <strong>{{ current_user.name if current_user else 'Evaluator' }}</strong> 
+            (Role: <code>{{ current_user.role|upper if current_user else 'UNAUTHENTICATED' }}</code> &bull; Doctor ID: <code>{{ doctor.doctor_id if doctor else 'D001' }}</code>)
+        </span>
+        <span>
+            Hardware Terminal: <code>{{ session_device_id }}</code> ({{ session_device_status }})
+        </span>
+    </div>
+</div>
+
+<!-- ====================================================================
+     THE 6-STEP SECURE ACCESS DECISION PIPELINE
+     ==================================================================== -->
+{% if pipeline %}
+<div class="content-card" style="padding: 24px; margin-bottom: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 12px;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--navy-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-diagram-project" style="color: var(--turquoise-primary);"></i> 6-Step Multi-Stage Access Verification
+        </h3>
+        
+        <div>
+            {% if pipeline.is_authorized %}
+            <span class="badge badge-low" style="font-size: 0.8rem; padding: 6px 12px; font-weight: 800;">
+                <i class="fa-solid fa-circle-check"></i> ACCESS AUTHORIZED &bull; {{ pipeline.mode }}
+            </span>
+            {% else %}
+            <span class="badge badge-critical" style="font-size: 0.8rem; padding: 6px 12px; font-weight: 800;">
+                <i class="fa-solid fa-circle-xmark"></i> ACCESS DENIED &bull; {{ pipeline.mode }}
+            </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 6 Visual Step Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 20px;">
+        {% for step in pipeline.steps %}
+        <div style="background: {% if step.passed %}#f0fdf4{% else %}#fef2f2{% endif %}; border: 1px solid {% if step.passed %}#bbf7d0{% else %}#fecaca{% endif %}; border-radius: 8px; padding: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.74rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">
+                    STEP {{ step.step_num }}
+                </span>
+                <span class="badge {% if step.passed %}badge-low{% else %}badge-critical{% endif %}" style="font-size: 0.65rem;">
+                    {% if step.passed %}PASSED{% else %}FAILED{% endif %}
+                </span>
+            </div>
+            <strong style="color: var(--navy-primary); font-size: 0.88rem; display: block; margin-bottom: 4px;">
+                {{ step.name }}
+            </strong>
+            <p style="font-size: 0.78rem; color: #475569; margin: 0; line-height: 1.4;">
+                {{ step.details }}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Step 6 Final Decision Strip -->
+    <div style="background: {% if pipeline.is_authorized %}#f0fdf4{% else %}#fef2f2{% endif %}; border-left: 4px solid {% if pipeline.is_authorized %}#10b981{% else %}#ef4444{% endif %}; padding: 16px 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+            <strong style="color: {% if pipeline.is_authorized %}#065f46{% else %}#991b1b{% endif %}; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                STEP 6 DECISION: {{ pipeline.decision }} ({{ pipeline.mode }})
+            </strong>
+            <p style="font-size: 0.82rem; color: #475569; margin: 3px 0 0;">
+                {{ pipeline.message }}
+            </p>
+        </div>
+
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700;">
+            Risk: <span style="color: {% if pipeline.risk_score >= 60 %}#dc2626{% else %}#059669{% endif %};">{{ pipeline.risk_score }}/100</span> ({{ pipeline.risk_level }})
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- ====================================================================
+     CLINICAL EMR RECORD DISPLAY (AUTHORIZED REAL VS BLOCKED DECOY)
+     ==================================================================== -->
+{% if pipeline and pipeline.is_authorized and patient %}
+<!-- AUTHORIZED REAL SYNTHETIC EMR CHART -->
+<div class="content-card" style="padding: 28px; margin-bottom: 40px; border: 2px solid #bbf7d0;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid var(--border-light); flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="width: 72px; height: 72px; border-radius: 10px; overflow: hidden; border: 2px solid var(--turquoise-primary); flex-shrink: 0;">
+                <img src="{{ patient_photo(patient.profile_photo, False) }}" alt="{{ patient.name }}" style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1/1;">
+            </div>
+            <div>
+                <span class="badge badge-low" style="font-size: 0.7rem; font-weight: 700; margin-bottom: 3px;">
+                    🛡️ PROTECTED SYNTHETIC RECORD
+                </span>
+                <h2 style="font-size: 1.45rem; font-weight: 900; color: var(--navy-primary); margin: 0;">
+                    {{ patient.name }}
+                </h2>
+                <span style="font-size: 0.82rem; color: var(--text-muted); font-family: var(--font-mono);">
+                    ID: <strong>{{ patient.patient_id }}</strong> &bull; {{ patient.age }} yrs &bull; {{ patient.gender }} &bull; Blood: {{ patient.blood_group }}
+                </span>
+            </div>
+        </div>
+
+        <div style="text-align: right;">
+            <span class="badge badge-critical" style="font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">
+                {{ patient.heart_condition_category }}
+            </span>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">
+                Attending: <strong>{{ patient.assigned_doctor_name or patient.assigned_doctor_id }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cardiac Vitals Strip -->
+    {% set vitals = format_vitals(patient.vitals) %}
+    <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: 8px; padding: 14px 20px; margin-bottom: 24px;">
+        <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 8px;">
+            <i class="fa-solid fa-heart-pulse" style="color: #ef4444;"></i> Cardiac Telemetry Vitals:
+        </span>
+        <div style="display: flex; gap: 24px; flex-wrap: wrap; font-size: 0.88rem;">
+            <div>Heart Rate: <strong style="color: #ef4444; font-family: var(--font-mono);">{{ vitals.heart_rate }} bpm</strong></div>
+            <div>Blood Pressure: <strong style="color: var(--navy-primary); font-family: var(--font-mono);">{{ vitals.blood_pressure }} mmHg</strong></div>
+            <div>SpO2: <strong style="color: #0284c7; font-family: var(--font-mono);">{{ vitals.spo2 }}%</strong></div>
+            <div>Rhythm: <strong style="color: #10b981;">{{ vitals.rhythm }}</strong></div>
+        </div>
+    </div>
+
+    <!-- Diagnostic Reports Grid: ECG, Echo, Blood Test -->
+    <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--navy-primary); margin: 0 0 14px;">
+        Diagnostic Telemetry &amp; Lab Panels
+    </h3>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: 8px; padding: 16px; box-shadow: var(--shadow-sm);">
+            <strong style="color: var(--navy-primary); font-size: 0.9rem; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                <i class="fa-solid fa-chart-line" style="color: #ef4444;"></i> ECG Diagnostic Report
+            </strong>
+            <p style="font-size: 0.82rem; color: #475569; margin: 0; line-height: 1.5; font-family: var(--font-mono);">
+                {{ patient.ecg_report }}
+            </p>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: 8px; padding: 16px; box-shadow: var(--shadow-sm);">
+            <strong style="color: var(--navy-primary); font-size: 0.9rem; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                <i class="fa-solid fa-wave-square" style="color: #0284c7;"></i> Echocardiogram Report
+            </strong>
+            <p style="font-size: 0.82rem; color: #475569; margin: 0; line-height: 1.5; font-family: var(--font-mono);">
+                {{ patient.echo_report }}
+            </p>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: 8px; padding: 16px; box-shadow: var(--shadow-sm);">
+            <strong style="color: var(--navy-primary); font-size: 0.9rem; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                <i class="fa-solid fa-vial" style="color: #7c3aed;"></i> Cardiac Biomarkers (Blood Panel)
+            </strong>
+            <p style="font-size: 0.82rem; color: #475569; margin: 0; line-height: 1.5; font-family: var(--font-mono);">
+                {{ patient.blood_test_report }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Medications Section (Zero raw JSON) -->
+    <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--navy-primary); margin: 0 0 14px;">
+        Active Cardiac Medications &amp; Prescriptions
+    </h3>
+
+    {% set meds = parse_medications(patient.current_prescriptions) %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 24px;">
+        {% for m in meds %}
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <strong style="color: var(--navy-primary); font-size: 0.92rem;">
+                    <i class="fa-solid fa-pills" style="color: var(--turquoise-primary); margin-right: 4px;"></i> {{ m.drug }}
+                </strong>
+                <span class="badge badge-low" style="font-size: 0.65rem;">Active</span>
+            </div>
+            <div style="font-size: 0.8rem; color: #475569; display: flex; flex-direction: column; gap: 4px;">
+                <div>Dose: <strong>{{ m.dose }}</strong></div>
+                <div>Route: <strong>{{ m.route }}</strong></div>
+                <div>Frequency: <strong>{{ m.frequency }}</strong></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Medical History -->
+    <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: 8px; padding: 16px;">
+        <strong style="color: var(--navy-primary); font-size: 0.88rem; display: block; margin-bottom: 4px;">
+            <i class="fa-solid fa-book-medical" style="color: var(--turquoise-primary);"></i> Clinical Medical History:
+        </strong>
+        <p style="font-size: 0.84rem; color: #475569; margin: 0; line-height: 1.5;">
+            {{ patient.medical_history }}
+        </p>
+    </div>
+</div>
+
+{% elif pipeline and not pipeline.is_authorized %}
+<!-- ACCESS DENIED / DECOY HONEYPOT DISPLAY -->
+<div class="content-card" style="padding: 28px; margin-bottom: 40px; border: 2px solid #fecaca; background: #fffafb;">
+    <div style="display: flex; align-items: flex-start; gap: 18px; margin-bottom: 20px;">
+        <div style="width: 56px; height: 56px; border-radius: 12px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div>
+            <span class="badge badge-critical" style="font-size: 0.72rem; margin-bottom: 4px;">SECURITY SHIELD ENGAGED</span>
+            <h2 style="font-size: 1.35rem; font-weight: 900; color: #991b1b; margin: 0 0 6px;">
+                Protected Medical Record Shielded &bull; Deception Sandbox Activated
+            </h2>
+            <p style="font-size: 0.86rem; color: #475569; margin: 0; line-height: 1.5;">
+                The real protected electronic medical record for patient <code>{{ selected_patient_id }}</code> has been blocked by CardioShield's Zero-Trust policy engine. The session was intercepted, risk penalties were assigned, and an intrusion event was audited.
+            </p>
+        </div>
+    </div>
+
+    <div style="background: #ffffff; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin-bottom: 20px; font-size: 0.82rem;">
+        <strong style="color: #991b1b; display: block; margin-bottom: 6px;">Interception Forensics:</strong>
+        <ul style="margin: 0; padding-left: 18px; color: #475569; line-height: 1.6;">
+            <li>Real database tables untouched; zero leakage of real clinical telemetry.</li>
+            <li>Security risk event recorded into <code>risk_events</code> ledger.</li>
+            <li>Security alert generated in SOC Incident Response queue.</li>
+            <li>Audit log marked with status <code>DENIED / DECOY_SERVED</code>.</li>
+        </ul>
+    </div>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="{{ url_for('cardioshield.decoy_environment_view') }}" class="btn btn-primary btn-sm" style="background: #7c3aed; border-color: #6d28d9;">
+            <i class="fa-solid fa-masks-theater"></i> Inspect Isolated Decoy Honeypot Sandbox
+        </a>
+        <a href="{{ url_for('cardioshield.audit_logs_view') }}" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-file-shield"></i> View Tamper-Evident Audit Logs
+        </a>
+        <a href="{{ url_for('cardioshield.break_glass_view') }}" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-kit-medical"></i> Emergency Break-Glass Override
+        </a>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

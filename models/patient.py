@@ -271,6 +271,28 @@ class PatientModel:
         execute_db("UPDATE patients SET status = ?, last_updated = CURRENT_TIMESTAMP WHERE patient_id = ?", (status, patient_id))
 
     @staticmethod
+    def assign_doctor(doctor_id, patient_id):
+        execute_db('''
+            INSERT INTO doctor_patient_assignments (doctor_id, patient_id, status)
+            VALUES (?, ?, 'ACTIVE')
+            ON CONFLICT(doctor_id, patient_id) DO UPDATE SET status = 'ACTIVE'
+        ''', (doctor_id, patient_id))
+        execute_db("UPDATE patients SET assigned_doctor_id = ? WHERE patient_id = ?", (doctor_id, patient_id))
+
+    @staticmethod
+    def delete_patient(patient_id):
+        pat = query_db("SELECT user_id, name FROM patients WHERE patient_id = ?", (patient_id,), one=True)
+        if pat:
+            execute_db("DELETE FROM doctor_patient_assignments WHERE patient_id = ?", (patient_id,))
+            execute_db("DELETE FROM medical_records WHERE patient_id = ?", (patient_id,))
+            execute_db("DELETE FROM emergency_access WHERE patient_id = ?", (patient_id,))
+            execute_db("DELETE FROM patients WHERE patient_id = ?", (patient_id,))
+            if pat['user_id']:
+                execute_db("DELETE FROM users WHERE user_id = ?", (pat['user_id'],))
+            return pat
+        return None
+
+    @staticmethod
     def _format(row):
         if not row:
             return None

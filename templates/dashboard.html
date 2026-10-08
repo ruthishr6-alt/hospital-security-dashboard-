@@ -1,0 +1,420 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Overview - CardioShield Healthcare Security{% endblock %}
+
+{% block content %}
+<div class="dashboard-header-strip" style="background: #ffffff; border-bottom: 1px solid var(--border-light); padding: 24px 0; margin-bottom: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                <span class="badge badge-info" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                    <i class="fa-solid fa-shield-heart"></i> Enterprise SOC &amp; Clinical Operations
+                </span>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">
+                    Hardware: <code>{{ session_device_id }}</code>
+                </span>
+            </div>
+            <h1 style="font-size: 1.85rem; font-weight: 900; color: var(--navy-primary); margin: 0;">
+                CardioShield Security Dashboard
+            </h1>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin: 4px 0 0;">
+                Intelligent Cybersecurity &amp; Real-time Privacy Protection for Critical Heart Patient Records
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <a href="{{ url_for('cardioshield.doctor_list') }}" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-user-doctor"></i> Doctor Roster
+            </a>
+            <a href="{{ url_for('patients.patient_list') }}" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-heart-pulse"></i> Patient Directory
+            </a>
+            <a href="{{ url_for('cardioshield.medical_records_view') }}" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-notes-medical"></i> Secure Access EMR
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ====================================================================
+     7 DASHBOARD OVERVIEW METRIC CARDS
+     ==================================================================== -->
+<section style="margin-bottom: 36px;">
+    <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="font-size: 1.15rem; font-weight: 800; color: var(--navy-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-gauge-high" style="color: var(--turquoise-primary);"></i> System Telemetry Overview
+        </h2>
+        <span style="font-size: 0.78rem; color: var(--text-muted);">
+            Updated: Live Zero-Trust Stream
+        </span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+        <!-- 1. Total Doctors -->
+        <a href="{{ url_for('cardioshield.doctor_list') }}" class="overview-metric-card" style="text-decoration: none; color: inherit;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Total Doctors</span>
+                <div class="icon-circle-sm" style="background: #e0f2fe; color: #0284c7;"><i class="fa-solid fa-user-doctor"></i></div>
+            </div>
+            <div style="font-size: 1.9rem; font-weight: 900; color: var(--navy-primary); line-height: 1;">{{ metrics.total_doctors }}</div>
+            <div style="font-size: 0.74rem; color: #0284c7; margin-top: 6px; font-weight: 600;">Credentialed Staff &rarr;</div>
+        </a>
+
+        <!-- 2. Total Patients -->
+        <a href="{{ url_for('patients.patient_list') }}" class="overview-metric-card" style="text-decoration: none; color: inherit;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Total Patients</span>
+                <div class="icon-circle-sm" style="background: #fef2f2; color: #ef4444;"><i class="fa-solid fa-heart-pulse"></i></div>
+            </div>
+            <div style="font-size: 1.9rem; font-weight: 900; color: var(--navy-primary); line-height: 1;">{{ metrics.total_patients }}</div>
+            <div style="font-size: 0.74rem; color: #ef4444; margin-top: 6px; font-weight: 600;">Monitored Heart Cases &rarr;</div>
+        </a>
+
+        <!-- 3. Active Sessions -->
+        <div class="overview-metric-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Active Sessions</span>
+                <div class="icon-circle-sm" style="background: #ecfdf5; color: #10b981;"><i class="fa-solid fa-network-wired"></i></div>
+            </div>
+            <div style="font-size: 1.9rem; font-weight: 900; color: var(--navy-primary); line-height: 1;">{{ metrics.active_sessions }}</div>
+            <div style="font-size: 0.74rem; color: #10b981; margin-top: 6px; font-weight: 600;">● Cryptographically Pinned</div>
+        </div>
+
+        <!-- 4. Security Alerts -->
+        <a href="{{ url_for('cardioshield.security_alerts_view') }}" class="overview-metric-card" style="text-decoration: none; color: inherit;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Security Alerts</span>
+                <div class="icon-circle-sm" style="background: #fffbeb; color: #f59e0b;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            </div>
+            <div style="font-size: 1.9rem; font-weight: 900; color: #b45309; line-height: 1;">{{ metrics.security_alerts }}</div>
+            <div style="font-size: 0.74rem; color: #b45309; margin-top: 6px; font-weight: 600;">Incident Queue &rarr;</div>
+        </a>
+
+        <!-- 5. High/Critical Risk Events -->
+        <a href="{{ url_for('security.risk_analysis') }}" class="overview-metric-card" style="text-decoration: none; color: inherit;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">High/Critical Risk</span>
+                <div class="icon-circle-sm" style="background: #fee2e2; color: #dc2626;"><i class="fa-solid fa-bolt"></i></div>
+            </div>
+            <div style="font-size: 1.9rem; font-weight: 900; color: #dc2626; line-height: 1;">{{ metrics.critical_risk_events }}</div>
+            <div style="font-size: 0.74rem; color: #dc2626; margin-top: 6px; font-weight: 600;">Risk Heuristics &rarr;</div>
+        </a>
+
+        <!-- 6. Decoy Sessions -->
+        <a href="{{ url_for('cardioshield.decoy_monitor_view') }}" class="overview-metric-card" style="text-decoration: none; color: inherit;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Decoy Sessions</span>
+                <div class="icon-circle-sm" style="background: #f5f3ff; color: #7c3aed;"><i class="fa-solid fa-masks-theater"></i></div>
+            </div>
+            <div style="font-size: 1.9rem; font-weight: 900; color: #6d28d9; line-height: 1;">{{ metrics.decoy_sessions }}</div>
+            <div style="font-size: 0.74rem; color: #7c3aed; margin-top: 6px; font-weight: 600;">Trapped In Sandboxes &rarr;</div>
+        </a>
+
+        <!-- 7. Recent Threats -->
+        <a href="{{ url_for('cardioshield.threat_monitoring_view') }}" class="overview-metric-card" style="text-decoration: none; color: inherit;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Recent Threats</span>
+                <div class="icon-circle-sm" style="background: #f1f5f9; color: #475569;"><i class="fa-solid fa-satellite-dish"></i></div>
+            </div>
+            <div style="font-size: 1.9rem; font-weight: 900; color: var(--navy-primary); line-height: 1;">{{ metrics.recent_threats }}</div>
+            <div style="font-size: 0.74rem; color: #475569; margin-top: 6px; font-weight: 600;">IDS Telemetry Feed &rarr;</div>
+        </a>
+    </div>
+</section>
+
+<!-- ====================================================================
+     DEDICATED SECURITY TOOLS NAVIGATION GRID
+     ==================================================================== -->
+<section style="margin-bottom: 40px;">
+    <div style="margin-bottom: 20px;">
+        <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--navy-primary); margin: 0 0 6px;">
+            <i class="fa-solid fa-screwdriver-wrench" style="color: var(--turquoise-primary);"></i> Dedicated Security &amp; Clinical Tools
+        </h2>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">
+            Every security subsystem is encapsulated in its own purpose-built monitoring and enforcement console.
+        </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+        <!-- Tool 1: Advanced Healthcare Security -->
+        <div class="security-tool-card">
+            <div class="tool-icon-box" style="background: #e0f2fe; color: #0284c7;">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div style="flex: 1;">
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--navy-primary); margin: 0 0 4px;">Advanced Healthcare Security</h3>
+                <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin: 0 0 12px;">
+                    Comprehensive breakdown of the 10 Zero-Trust defense layers including dynamic risk weighting and session isolation.
+                </p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge badge-low" style="font-size: 0.7rem;">Architecture</span>
+                    <a href="{{ url_for('cardioshield.advanced_security') }}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+                        Open Tool &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tool 2: Security Alerts -->
+        <div class="security-tool-card">
+            <div class="tool-icon-box" style="background: #fffbeb; color: #d97706;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div style="flex: 1;">
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--navy-primary); margin: 0 0 4px;">Security Alerts</h3>
+                <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin: 0 0 12px;">
+                    Real-time incident response queue with triage statuses: NEW, INVESTIGATING, and RESOLVED.
+                </p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge badge-medium" style="font-size: 0.7rem;">{{ metrics.security_alerts }} Active</span>
+                    <a href="{{ url_for('cardioshield.security_alerts_view') }}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+                        Open Alerts &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tool 3: Risk Analysis -->
+        <div class="security-tool-card">
+            <div class="tool-icon-box" style="background: #ecfdf5; color: #059669;">
+                <i class="fa-solid fa-scale-balanced"></i>
+            </div>
+            <div style="flex: 1;">
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--navy-primary); margin: 0 0 4px;">Risk Analysis</h3>
+                <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin: 0 0 12px;">
+                    Algorithmic 0–100 risk scoring breakdown, factor weighting, historical anomalies, and simulator engine.
+                </p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge badge-info" style="font-size: 0.7rem;">Dynamic Engine</span>
+                    <a href="{{ url_for('security.risk_analysis') }}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+                        Analyze Risk &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tool 4: Threat Monitoring -->
+        <div class="security-tool-card">
+            <div class="tool-icon-box" style="background: #f1f5f9; color: #475569;">
+                <i class="fa-solid fa-satellite-dish"></i>
+            </div>
+            <div style="flex: 1;">
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--navy-primary); margin: 0 0 4px;">Threat Monitoring</h3>
+                <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin: 0 0 12px;">
+                    Active telemetry tracking failed logins, unauthorized cross-patient traversal, scraping, and unknown terminals.
+                </p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge badge-critical" style="font-size: 0.7rem;">IDS / IPS</span>
+                    <a href="{{ url_for('cardioshield.threat_monitoring_view') }}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+                        View Telemetry &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tool 5: Decoy Environment -->
+        <div class="security-tool-card">
+            <div class="tool-icon-box" style="background: #f5f3ff; color: #7c3aed;">
+                <i class="fa-solid fa-masks-theater"></i>
+            </div>
+            <div style="flex: 1;">
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--navy-primary); margin: 0 0 4px;">Decoy Environment</h3>
+                <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin: 0 0 12px;">
+                    Isolated synthetic canary sandbox with honeytokens. Serves realistic fake heart records to suspicious sessions.
+                </p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge badge-decoy" style="font-size: 0.7rem;">10 Honeypots</span>
+                    <a href="{{ url_for('cardioshield.decoy_environment_view') }}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+                        Enter Sandbox &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tool 6: Decoy Activity Monitor -->
+        <div class="security-tool-card">
+            <div class="tool-icon-box" style="background: #faf5ff; color: #9333ea;">
+                <i class="fa-solid fa-radar"></i>
+            </div>
+            <div style="flex: 1;">
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--navy-primary); margin: 0 0 4px;">Decoy Activity Monitor</h3>
+                <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin: 0 0 12px;">
+                    Live feed of trapped intruder interactions: fake records inspected, request volume, and deception sessions.
+                </p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge badge-decoy" style="font-size: 0.7rem;">Trapped Telemetry</span>
+                    <a href="{{ url_for('cardioshield.decoy_monitor_view') }}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+                        Monitor Traps &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tool 7: Audit Logs -->
+        <div class="security-tool-card">
+            <div class="tool-icon-box" style="background: #f0fdfa; color: #0d9488;">
+                <i class="fa-solid fa-file-shield"></i>
+            </div>
+            <div style="flex: 1;">
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--navy-primary); margin: 0 0 4px;">Audit Logs</h3>
+                <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin: 0 0 12px;">
+                    Immutable tamper-evident chronological ledger tracking every clinical, login, and authorization event.
+                </p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge badge-low" style="font-size: 0.7rem;">Forensics</span>
+                    <a href="{{ url_for('cardioshield.audit_logs_view') }}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+                        Browse Logs &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tool 8: Device Security -->
+        <div class="security-tool-card">
+            <div class="tool-icon-box" style="background: #eef2ff; color: #4f46e5;">
+                <i class="fa-solid fa-laptop-medical"></i>
+            </div>
+            <div style="flex: 1;">
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--navy-primary); margin: 0 0 4px;">Device Security</h3>
+                <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin: 0 0 12px;">
+                    Hardware fingerprinting and binding registry distinguishing authorized ICU workstations from untrusted endpoints.
+                </p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge badge-info" style="font-size: 0.7rem;">Zero-Trust Trust</span>
+                    <a href="{{ url_for('cardioshield.device_security_view') }}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+                        Inspect Devices &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tool 9: Emergency Break-Glass -->
+        <div class="security-tool-card">
+            <div class="tool-icon-box" style="background: #fff1f2; color: #e11d48;">
+                <i class="fa-solid fa-kit-medical"></i>
+            </div>
+            <div style="flex: 1;">
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--navy-primary); margin: 0 0 4px;">Emergency Break-Glass</h3>
+                <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin: 0 0 12px;">
+                    Audited 15-minute emergency override protocol granting temporary patient access with full SOC dispatch.
+                </p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge badge-critical" style="font-size: 0.7rem;">Emergency Override</span>
+                    <a href="{{ url_for('cardioshield.break_glass_view') }}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+                        Break-Glass &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====================================================================
+     RECENT SECURITY INCIDENTS STRIP
+     ==================================================================== -->
+<section style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-sm);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--navy-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-clock-rotate-left" style="color: var(--turquoise-primary);"></i> Recent Security Alerts Stream
+        </h3>
+        <a href="{{ url_for('cardioshield.security_alerts_view') }}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+            View All Alerts &rarr;
+        </a>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="table" style="margin-bottom: 0;">
+            <thead>
+                <tr>
+                    <th>Alert ID</th>
+                    <th>Threat Type</th>
+                    <th>Severity</th>
+                    <th>User / Subject</th>
+                    <th>Risk Score</th>
+                    <th>Status</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in recent_alerts %}
+                <tr>
+                    <td><code>{{ a.alert_id }}</code></td>
+                    <td><strong>{{ a.threat_type }}</strong></td>
+                    <td>
+                        <span class="badge {% if a.severity == 'CRITICAL' %}badge-critical{% elif a.severity == 'HIGH' %}badge-high{% elif a.severity == 'MEDIUM' %}badge-medium{% else %}badge-low{% endif %}">
+                            {{ a.severity }}
+                        </span>
+                    </td>
+                    <td><code>{{ a.user_id }}</code></td>
+                    <td><strong>{{ a.risk_score }}/100</strong></td>
+                    <td>
+                        <span class="badge {% if a.status == 'NEW' %}badge-critical{% elif a.status == 'INVESTIGATING' %}badge-medium{% else %}badge-low{% endif %}">
+                            {{ a.status }}
+                        </span>
+                    </td>
+                    <td style="font-size: 0.78rem; color: var(--text-muted);">{{ a.timestamp }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 20px;">
+                        No active security incidents recorded in this session.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<style>
+.overview-metric-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  display: block;
+}
+.overview-metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--turquoise-primary);
+}
+.icon-circle-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+.security-tool-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.22s ease;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.security-tool-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--turquoise-primary);
+}
+.tool-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+</style>
+{% endblock %}

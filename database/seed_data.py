@@ -76,7 +76,7 @@ def seed_database():
     # =========================================================================
     real_patients_data = [
         (
-            'HP-501', 'Arthur Pendelton', 68, 'Male', 'O+',
+           " 'HP-501', 'Arthur Pendelton', 68, 'Male', 'O+',
             'Acute ST-Elevation Myocardial Infarction (Anterior STEMI)', 'CRITICAL',
             '2026-10-03 04:15:00', 'ICU-Bed-01', 'DOC101',
             json.dumps({'heart_rate': 114, 'blood_pressure': '90/60 mmHg', 'spo2': '92%', 'temp': '37.1 C', 'resp_rate': 24, 'rhythm': 'Sinus Tachycardia with ST elevation'}),
@@ -84,7 +84,7 @@ def seed_database():
             'Penicillin, Contrast Dye',
             'DEMO-ECG-501: Significant ST-segment elevations in V1-V4 (3.5mm). Reciprocal depressions in II, III, aVF. Hyperacute T waves.',
             'Transthoracic Echo: Hypokinesis of anterior and apical left ventricular walls. Left ventricular enlargement.',
-            28,
+            28,"
             json.dumps([
                 {'test': 'High-Sensitivity Troponin-I', 'value': '14.8 ng/mL', 'reference': '< 0.04 ng/mL', 'status': 'CRITICAL_HIGH'},
                 {'test': 'NT-proBNP', 'value': '4,850 pg/mL', 'reference': '< 125 pg/mL', 'status': 'HIGH'},
@@ -100,7 +100,7 @@ def seed_database():
             'Patient undergoing emergency primary percutaneous coronary intervention (PPCI). Strict hemodynamic telemetry monitoring required.'
         ),
         (
-            'HP-502', 'Helena Rostova', 54, 'Female', 'A-',
+            "'HP-502', 'Helena Rostova', 54, 'Female', 'A-',
             'Sustained Monomorphic Ventricular Tachycardia (VT)', 'CRITICAL',
             '2026-10-04 08:30:00', 'ICU-Bed-02', 'DOC102',
             json.dumps({'heart_rate': 178, 'blood_pressure': '82/50 mmHg', 'spo2': '90%', 'temp': '36.8 C', 'resp_rate': 26, 'rhythm': 'Wide Complex Ventricular Tachycardia'}),
@@ -108,7 +108,7 @@ def seed_database():
             'Sulfa drugs',
             'DEMO-ECG-502: Wide QRS complexes (> 160ms) at 178 bpm. AV dissociation noted with fusion and capture beats.',
             'Echo: Global left ventricular hypokinesis, severe mitral regurgitation (Grade III/IV), paradoxical septal motion.',
-            24,
+            24,"
             json.dumps([
                 {'test': 'Serum Magnesium', 'value': '1.4 mg/dL', 'reference': '1.7 - 2.2 mg/dL', 'status': 'LOW'},
                 {'test': 'Troponin-I', 'value': '0.85 ng/mL', 'reference': '< 0.04 ng/mL', 'status': 'ELEVATED'},
@@ -123,7 +123,7 @@ def seed_database():
             'Cardioversion standby prepared. Electrophysiology team evaluating urgent ICD (Implantable Cardioverter-Defibrillator) revision.'
         ),
         (
-            'HP-503', 'Marcus Thorne', 72, 'Male', 'B+',
+            "'HP-503', 'Marcus Thorne', 72, 'Male', 'B+',
             'Acute Decompensated Heart Failure (Wet & Cold Profile)', 'SEVERE',
             '2026-10-02 11:20:00', 'CCU-Room-04', 'DOC103',
             json.dumps({'heart_rate': 98, 'blood_pressure': '105/65 mmHg', 'spo2': '91% on 4L NC', 'temp': '36.9 C', 'resp_rate': 22, 'rhythm': 'Sinus Rhythm with Frequent PVCs'}),
@@ -131,7 +131,7 @@ def seed_database():
             'None known',
             'DEMO-ECG-503: Left bundle branch block (LBBB) with QRS width 150ms. Secondary repolarization ST-T abnormalities.',
             'Echo: Severely reduced EF, restrictive filling pattern (E/A ratio > 2.0). Dilated IVC with absent inspiratory collapse.',
-            22,
+            22,"
             json.dumps([
                 {'test': 'NT-proBNP', 'value': '9,200 pg/mL', 'reference': '< 125 pg/mL', 'status': 'CRITICAL_HIGH'},
                 {'test': 'Serum Creatinine', 'value': '2.1 mg/dL', 'reference': '0.7 - 1.3 mg/dL', 'status': 'ELEVATED'},
@@ -145,7 +145,7 @@ def seed_database():
             'Aggressive diuresis in progress. Strict fluid restriction to 1.5 L/24h. Daily weight telemetry linked.'
         ),
         (
-            'HP-504', 'Sophia Lindqvist', 42, 'Female', 'O-',
+           " 'HP-504', 'Sophia Lindqvist', 42, 'Female', 'O-',
             'Severe Peripartum Cardiomyopathy with Apical Thrombus', 'CRITICAL',
             '2026-10-04 15:45:00', 'ICU-Bed-03', 'DOC103',
             json.dumps({'heart_rate': 108, 'blood_pressure': '95/62 mmHg', 'spo2': '94%', 'temp': '37.0 C', 'resp_rate': 20, 'rhythm': 'Sinus Tachycardia'}),
@@ -153,7 +153,7 @@ def seed_database():
             'Aspirin (bronchospasm)',
             'DEMO-ECG-504: Sinus tachycardia, biatrial enlargement, non-specific T wave flattenings in lateral leads.',
             'Echo: LVEF 18%. Clear 1.8cm pedunculated apical thrombus. Spontaneous echo contrast in left ventricle.',
-            18,
+            18,"
             json.dumps([
                 {'test': 'NT-proBNP', 'value': '7,600 pg/mL', 'reference': '< 125 pg/mL', 'status': 'HIGH'},
                 {'test': 'D-Dimer', 'value': '1.8 mcg/mL', 'reference': '< 0.5 mcg/mL', 'status': 'ELEVATED'},
@@ -167,7 +167,7 @@ def seed_database():
             'High embolic risk due to mobile apical clot. Heart transplant team notified for backup mechanical circulatory support (Impella/ECMO).'
         ),
         (
-            'HP-505', 'Dmitri Volkov', 61, 'Male', 'AB+',
+            "'HP-505', 'Dmitri Volkov', 61, 'Male', 'AB+',
             'Critical Aortic Stenosis with Syncope and Cardiogenic Shock', 'CRITICAL',
             '2026-10-01 19:10:00', 'ICU-Bed-04', 'DOC101',
             json.dumps({'heart_rate': 92, 'blood_pressure': '84/55 mmHg', 'spo2': '93%', 'temp': '36.7 C', 'resp_rate': 22, 'rhythm': 'Sinus rhythm with LV Strain'}),
@@ -175,7 +175,7 @@ def seed_database():
             'Codeine',
             'DEMO-ECG-505: Severe LVH by voltage criteria (Sokolow-Lyon index > 42mm). Deep asymmetric T-wave inversions in I, aVL, V5-V6.',
             'Echo: Aortic valve area 0.58 cm2, mean transvalvular pressure gradient 52 mmHg, peak jet velocity 4.8 m/s.',
-            30,
+            30,"
             json.dumps([
                 {'test': 'Troponin-I', 'value': '0.42 ng/mL', 'reference': '< 0.04 ng/mL', 'status': 'ELEVATED'},
                 {'test': 'Lactate', 'value': '2.6 mmol/L', 'reference': '0.5 - 2.0 mmol/L', 'status': 'ELEVATED'},
@@ -188,7 +188,7 @@ def seed_database():
             'Scheduled for urgent emergent TAVR (Transcatheter Aortic Valve Replacement). Avoid aggressive vasodilators.'
         ),
         (
-            'HP-506', 'Grace Chen', 79, 'Female', 'O+',
+           " 'HP-506', 'Grace Chen', 79, 'Female', 'O+',
             'Complete Atrioventricular Heart Block (Third-Degree AV Block)', 'CRITICAL',
             '2026-10-05 02:40:00', 'CCU-Room-02', 'DOC102',
             json.dumps({'heart_rate': 34, 'blood_pressure': '78/48 mmHg', 'spo2': '92%', 'temp': '36.4 C', 'resp_rate': 18, 'rhythm': 'Complete Heart Block with Ventricular Escape'}),
@@ -196,7 +196,7 @@ def seed_database():
             'Iodine',
             'DEMO-ECG-506: Total AV dissociation. P wave rate 84 bpm, ventricular escape rhythm 34 bpm with broad atypical complexes.',
             'Echo: Preserved LVEF 50%, mild aortic regurgitation, normal ventricular dimensions.',
-            50,
+            50,"
             json.dumps([
                 {'test': 'Serum Potassium', 'value': '4.3 mEq/L', 'reference': '3.5 - 5.0 mEq/L', 'status': 'NORMAL'},
                 {'test': 'Thyroid Stimulating Hormone', 'value': '2.1 mIU/L', 'reference': '0.4 - 4.0 mIU/L', 'status': 'NORMAL'},
@@ -209,7 +209,7 @@ def seed_database():
             'Temporary transvenous pacing wire actively placed via right internal jugular. Dual-chamber permanent pacemaker insertion scheduled today.'
         ),
         (
-            'HP-507', 'Liam O Connor', 58, 'Male', 'A+',
+            "'HP-507', 'Liam O Connor', 58, 'Male', 'A+',
             'Subacute Bacterial Endocarditis with Severe Mitral Valve Vegetations', 'SEVERE',
             '2026-10-02 18:00:00', 'CCU-Room-07', 'DOC105',
             json.dumps({'heart_rate': 102, 'blood_pressure': '112/68 mmHg', 'spo2': '95%', 'temp': '38.6 C', 'resp_rate': 20, 'rhythm': 'Sinus Tachycardia'}),

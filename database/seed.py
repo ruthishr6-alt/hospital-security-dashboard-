@@ -44,6 +44,9 @@ def seed():
         ('DEV-DOC03-TRUSTED', 'U_DOC03', 'Ward Medical Tablet #03', 'TRUSTED', -5),
         ('DEV-DOC04-TRUSTED', 'U_DOC04', 'EP Laboratory Desktop #04', 'TRUSTED', -5),
         ('DEV-DOC05-TRUSTED', 'U_DOC05', 'Heart Failure ICU Station #05', 'TRUSTED', -5),
+        ('DEV-DOC06-TRUSTED', 'U_DOC06', 'Cardiology Clinic Terminal #06', 'TRUSTED', -5),
+        ('DEV-DOC07-TRUSTED', 'U_DOC07', 'Pediatric Cardiology Tablet #07', 'TRUSTED', -5),
+        ('DEV-DOC08-TRUSTED', 'U_DOC08', 'Surgical CCU Workstation #08', 'TRUSTED', -5),
         ('DEV-ADMIN-TRUSTED', 'U_ADMIN01', 'SOC Security Console #01', 'TRUSTED', -5),
         ('DEV-UNKNOWN-EXT-88', None, 'External Unknown Laptop (198.51.100.42)', 'UNKNOWN', 20),
         ('DEV-UNKNOWN-EXT-99', None, 'Anonymous Tor Exit / Public Wi-Fi', 'UNKNOWN', 20)
@@ -65,7 +68,10 @@ def seed():
         ('U_DOC02', 'doctor_demo_02', pw_doctor, 'doctor', 'Dr. Marcus Vance, MD', 'marcus.vance@cardio.internal', 'active'),
         ('U_DOC03', 'doctor_demo_03', pw_doctor, 'doctor', 'Dr. Elena Rostova, MD', 'elena.rostova@cardio.internal', 'active'),
         ('U_DOC04', 'doctor_demo_04', pw_doctor, 'doctor', 'Dr. David Kim, MD', 'david.kim@cardio.internal', 'active'),
-        ('U_DOC05', 'doctor_demo_05', pw_doctor, 'doctor', 'Dr. Aisha Patel, MD', 'aisha.patel@cardio.internal', 'active')
+        ('U_DOC05', 'doctor_demo_05', pw_doctor, 'doctor', 'Dr. Aisha Patel, MD', 'aisha.patel@cardio.internal', 'active'),
+        ('U_DOC06', 'doctor_demo_06', pw_doctor, 'doctor', 'Dr. Arun Kumar, MD', 'arun.kumar@cardio.internal', 'active'),
+        ('U_DOC07', 'doctor_demo_07', pw_doctor, 'doctor', 'Dr. Maya Chen, MD', 'maya.chen@cardio.internal', 'active'),
+        ('U_DOC08', 'doctor_demo_08', pw_doctor, 'doctor', 'Dr. James Thornton, MD', 'james.thornton@cardio.internal', 'active')
     ]
     cursor.executemany('''
         INSERT INTO users (user_id, username, password_hash, role, name, email, status)
@@ -73,11 +79,14 @@ def seed():
     ''', users)
 
     doctors = [
-        ('D001', 'U_DOC01', 'Dr. Sarah Lin, MD', 'doc_d001.svg', 'Senior Interventional Cardiology', 'Senior Interventional Cardiology', 'MBBS, MD Cardiology, FACC', '12 Years', 'Cardiology ICU', 'sarah.lin@cardio.internal', '+1 (555) 019-2831', 'HIGHLY_CONFIDENTIAL', 'DEV-DOC01-TRUSTED', 'active'),
-        ('D002', 'U_DOC02', 'Dr. Marcus Vance, MD', 'doc_d002.svg', 'Staff Cardiologist', 'Cardiologist', 'MBBS, MD Internal Medicine, DM Cardiology', '9 Years', 'Cardiac Care Unit (CCU)', 'marcus.vance@cardio.internal', '+1 (555) 019-2832', 'CONFIDENTIAL', 'DEV-DOC02-TRUSTED', 'active'),
-        ('D003', 'U_DOC03', 'Dr. Elena Rostova, MD', 'doc_d003.svg', 'Resident Cardiologist', 'Cardiology Resident', 'MBBS, MD Cardiology', '4 Years', 'General Cardiology Ward', 'elena.rostova@cardio.internal', '+1 (555) 019-2833', 'NORMAL', 'DEV-DOC03-TRUSTED', 'active'),
-        ('D004', 'U_DOC04', 'Dr. David Kim, MD', 'doc_d004.svg', 'Electrophysiologist', 'Cardiac Electrophysiology', 'MBBS, MD, FHRS', '10 Years', 'Arrhythmia Care Unit', 'david.kim@cardio.internal', '+1 (555) 019-2834', 'CONFIDENTIAL', 'DEV-DOC04-TRUSTED', 'active'),
-        ('D005', 'U_DOC05', 'Dr. Aisha Patel, MD', 'doc_d005.svg', 'Advanced Heart Failure & Transplant', 'Heart Failure Specialist', 'MBBS, MD Cardiology, FHFSA', '15 Years', 'Heart Failure ICU', 'aisha.patel@cardio.internal', '+1 (555) 019-2835', 'HIGHLY_CONFIDENTIAL', 'DEV-DOC05-TRUSTED', 'active')
+        ('D001', 'U_DOC01', 'Dr. Sarah Lin, MD', 'doc_sarah_lin.jpg', 'Senior Interventional Cardiology', 'Senior Interventional Cardiology', 'MBBS, MD Cardiology, FACC', '12 Years', 'Cardiology ICU', 'sarah.lin@cardio.internal', '+1 (555) 019-2831', 'HIGHLY_CONFIDENTIAL', 'DEV-DOC01-TRUSTED', 'active'),
+        ('D002', 'U_DOC02', 'Dr. Marcus Vance, MD', 'doc_marcus_vance.jpg', 'Staff Cardiologist', 'Cardiologist', 'MBBS, MD Internal Medicine, DM Cardiology', '9 Years', 'Cardiac Care Unit (CCU)', 'marcus.vance@cardio.internal', '+1 (555) 019-2832', 'CONFIDENTIAL', 'DEV-DOC02-TRUSTED', 'active'),
+        ('D003', 'U_DOC03', 'Dr. Elena Rostova, MD', 'doc_elena_rostova.jpg', 'Resident Cardiologist', 'Cardiology Resident', 'MBBS, MD Cardiology', '4 Years', 'General Cardiology Ward', 'elena.rostova@cardio.internal', '+1 (555) 019-2833', 'NORMAL', 'DEV-DOC03-TRUSTED', 'active'),
+        ('D004', 'U_DOC04', 'Dr. David Kim, MD', 'doc_david_kim.jpg', 'Electrophysiologist', 'Cardiac Electrophysiology', 'MBBS, MD, FHRS', '10 Years', 'Arrhythmia Care Unit', 'david.kim@cardio.internal', '+1 (555) 019-2834', 'CONFIDENTIAL', 'DEV-DOC04-TRUSTED', 'active'),
+        ('D005', 'U_DOC05', 'Dr. Aisha Patel, MD', 'doc_aisha_patel.jpg', 'Advanced Heart Failure & Transplant', 'Heart Failure Specialist', 'MBBS, MD Cardiology, FHFSA', '15 Years', 'Heart Failure ICU', 'aisha.patel@cardio.internal', '+1 (555) 019-2835', 'HIGHLY_CONFIDENTIAL', 'DEV-DOC05-TRUSTED', 'active'),
+        ('D006', 'U_DOC06', 'Dr. Arun Kumar, MD', 'doc_arun_kumar.jpg', 'Cardiologist', 'Cardiologist', 'MBBS, MD', '8 Years Experience', 'Cardiology Department', 'arun.kumar@cardio.internal', '+1 (555) 019-2836', 'CONFIDENTIAL', 'DEV-DOC06-TRUSTED', 'active'),
+        ('D007', 'U_DOC07', 'Dr. Maya Chen, MD', 'doc_maya_chen.jpg', 'Pediatric Cardiology', 'Pediatric Cardiologist', 'MBBS, MD, PhD', '11 Years Experience', 'Pediatric Cardiology Unit', 'maya.chen@cardio.internal', '+1 (555) 019-2837', 'CONFIDENTIAL', 'DEV-DOC07-TRUSTED', 'active'),
+        ('D008', 'U_DOC08', 'Dr. James Thornton, MD', 'doc_james_thornton.jpg', 'Cardiothoracic Specialist', 'Cardiothoracic Surgeon', 'MBBS, MS, MCh', '16 Years Experience', 'Cardiology Department', 'james.thornton@cardio.internal', '+1 (555) 019-2838', 'HIGHLY_CONFIDENTIAL', 'DEV-DOC08-TRUSTED', 'active')
     ]
     cursor.executemany('''
         INSERT INTO doctors (
@@ -310,7 +319,10 @@ def seed():
         ('D004', 'HP006'),
         ('D004', 'HP007'),
         ('D005', 'HP008'),
-        ('D005', 'HP009')
+        ('D005', 'HP009'),
+        ('D006', 'HP002'),
+        ('D007', 'HP008'),
+        ('D008', 'HP004')
     ]
     cursor.executemany('''
         INSERT INTO doctor_patient_assignments (doctor_id, patient_id)

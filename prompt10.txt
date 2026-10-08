@@ -1,0 +1,651 @@
+<USER_REQUEST>
+Modify my existing CardioShield healthcare cybersecurity website. DO NOT create a new application and DO NOT remove existing functionality.
+
+I want the website navigation and pages to be reorganized properly.
+
+PROJECT:
+CardioShield – Risk-Aware Cybersecurity System for Protecting Critical Heart Patient Records
+
+IMPORTANT:
+- Keep the existing professional hospital/healthcare UI.
+- No cyberpunk/neon/gaming design.
+- All patient/medical information is SYNTHETIC/DEMO DATA.
+- All newly created Doctor and Patient profiles must be stored permanently in the database.
+- Data must remain available after page refresh, logout/login, server restart and Render redeployment as far as the configured persistent database/storage allows.
+- Do not store important profile data only in frontend/localStorage.
+- Use the existing backend/database architecture.
+- Do not break existing security alerts, risk engine, audit logs, decoy system or authentication.
+
+==================================================
+1. HOME PAGE
+==================================================
+
+The Home page should be a professional healthcare landing page.
+
+HOME PAGE SHOULD SHOW ONLY:
+- Hospital/healthcare introduction
+- CardioShield project introduction
+- Professional Doctors section
+- Doctor cards with:
+  - Doctor photo
+  - Doctor name
+  - Specialization
+  - Qualification
+  - Experience
+  - Department
+  - Professional contact information where appropriate
+
+Do NOT put the complete patient list on the Home page.
+
+Do NOT put every dashboard security tool on the Home page.
+
+Keep Home focused mainly on:
+Healthcare + Doctors + CardioShield introduction.
+
+==================================================
+2. DASHBOARD
+==================================================
+
+Create a separate Dashboard page.
+
+Dashboard should contain the main security overview and navigation to separate tools.
+
+Dashboard overview cards:
+- Total Doctors
+- Total Patients
+- Active Sessions
+- Security Alerts
+- High/Critical Risk Events
+- Decoy Sessions
+- Recent Threats
+
+IMPORTANT:
+Every major Dashboard tool must have its OWN separate page.
+
+Do not put all tools into one giant page.
+
+==================================================
+3. DASHBOARD SECURITY TOOLS – SEPARATE PAGES
+==================================================
+
+Create separate pages for:
+
+A. Advanced Healthcare Security
+Route example:
+ /advanced-security
+
+This page should explain and display:
+- Risk-Based Access Control
+- Role-Based Access Control
+- Patient-Specific Authorization
+- Multi-Factor Authentication
+- Threat Detection
+- Insider Threat Detection
+- Data Sensitivity
+- Secure Sessions
+- Device Security
+- Audit Monitoring
+
+B. Security Alerts
+ /security-alerts
+
+Show:
+- Alert ID
+- Threat Type
+- Severity
+- User
+- Timestamp
+- Risk Score
+- Description
+- Status
+
+Status:
+NEW
+INVESTIGATING
+RESOLVED
+
+C. Risk Analysis
+ /risk-analysis
+
+Show:
+- Current risk score
+- Risk level
+- Risk factors
+- Recent risk events
+- User activity
+- Explanation of why the score changed
+
+D. Threat Monitoring
+ /threat-monitoring
+
+Show:
+- Failed login attempts
+- Unauthorized access
+- Bulk access
+- Suspicious API activity
+- Unknown device activity
+- Insider-like behavior
+- Admin access attempts
+
+E. Decoy Environment
+ /decoy-environment
+
+Show ONLY synthetic decoy records.
+
+Show:
+- Decoy patients
+- Fake medical records
+- Decoy session ID
+- Suspicious user/session
+- Timestamp
+- Actions performed
+- Risk level
+
+Clearly display:
+"DECOY / SYNTHETIC DATA – NOT REAL PATIENT INFORMATION"
+
+F. Decoy Activity Monitor
+ /decoy-monitor
+
+Show:
+- Active decoy sessions
+- Fake records accessed
+- Session activity
+- Request count
+- Threat level
+- Timestamp
+
+G. Audit Logs
+ /audit-logs
+
+Show:
+- Timestamp
+- User
+- Role
+- Patient
+- Action
+- Session ID
+- Risk score
+- Result
+- Threat type
+
+H. Device Security
+ /device-security
+
+Show:
+- Trusted devices
+- Unknown devices
+- Device status
+- Last activity
+- User
+- Risk status
+
+I. Emergency Break-Glass
+ /break-glass
+
+Show:
+- Doctor
+- Patient
+- Reason
+- Requested time
+- Approval/status
+- Temporary access expiry
+- Risk score before/after
+- Complete audit history
+
+==================================================
+4. DOCTOR SECTION
+==================================================
+
+Create a dedicated Doctor page:
+
+/doctors
+
+This page should contain:
+
+DOCTOR LIST:
+- Doctor photo
+- Doctor name
+- Doctor ID
+- Specialization
+- Department
+- Qualification
+- Experience
+- Phone
+- Email
+- Account status
+
+Add button:
+
+"+ Create New Doctor"
+
+==================================================
+5. CREATE NEW DOCTOR PROFILE
+==================================================
+
+Create a separate page:
+
+/doctors/new
+
+User should be able to create a Doctor profile.
+
+Fields:
+- Full Name
+- Profile Photo
+- Phone Number
+- Email
+- Doctor ID
+- Specialization
+- Qualification
+- Experience
+- Department
+- Permission Level
+- Account Status
+
+Photo:
+- JPG
+- JPEG
+- PNG
+- WEBP
+- Show preview
+- Validate file size
+- Allow changing/removing photo
+
+After clicking SAVE:
+
+1. Validate all fields.
+2. Save Doctor data to the backend database.
+3. Save uploaded profile photo using proper server-side storage.
+4. Generate unique Doctor ID if needed.
+5. Create an audit-log event.
+6. Redirect to Doctor Details/Profile page.
+7. Doctor must appear in the Doctor list immediately.
+
+IMPORTANT:
+Do NOT use only localStorage.
+Do NOT keep the new doctor only in frontend state.
+
+==================================================
+6. DOCTOR DETAILS PAGE
+==================================================
+
+Create:
+
+/doctors/:doctor_id
+
+Show complete doctor profile:
+- Photo
+- Name
+- Doctor ID
+- Phone
+- Email
+- Specialization
+- Qualification
+- Experience
+- Department
+- Permission Level
+- Account Status
+- Assigned Patients
+- Last Login
+- Trusted Device Status
+- Recent Activity
+
+Buttons:
+- Edit Doctor
+- Delete Doctor (Admin only)
+- View Assigned Patients
+- View Audit Activity
+
+==================================================
+7. PATIENT SECTION
+==================================================
+
+Create a dedicated Patient page:
+
+/patients
+
+This page should contain:
+- Patient photo
+- Patient name
+- Patient ID
+- Age
+- Gender
+- Blood Group
+- Assigned Doctor
+- Heart Condition Category
+- Record Sensitivity
+- Access Status
+
+Add button:
+
+"+ Create New Patient"
+
+==================================================
+8. CREATE NEW PATIENT PROFILE
+==================================================
+
+Create:
+
+/patients/new
+
+User should be able to enter:
+
+- Full Name
+- Profile Photo
+- Phone Number
+- Email
+- Patient ID
+- Age
+- Gender
+- Blood Group
+- Assigned Doctor
+- Heart Condition Category
+- Medical History
+- Emergency Contact
+- Record Sensitivity
+- Access Status
+
+IMPORTANT:
+All medical information must be SYNTHETIC/DEMO DATA.
+
+Photo:
+- JPG
+- JPEG
+- PNG
+- WEBP
+- Preview
+- File validation
+- Change/remove option
+
+After SAVE:
+
+1. Validate fields.
+2. Save Patient profile permanently to backend database.
+3. Save photo through proper server-side storage.
+4. Generate unique Patient ID if needed.
+5. Create audit-log entry.
+6. Redirect to Patient Details page.
+7. Patient must immediately appear in Patient list.
+
+Do NOT use only localStorage.
+
+==================================================
+9. PATIENT DETAILS PAGE
+==================================================
+
+Create:
+
+/patients/:patient_id
+
+Show:
+
+- Patient photo
+- Patient name
+- Patient ID
+- Phone
+- Email
+- Age
+- Gender
+- Blood Group
+- Assigned Doctor
+- Heart Condition Category
+- Medical History
+- Emergency Contact
+- Record Sensitivity
+- Access Status
+- Last Updated
+
+Buttons:
+- Edit Patient
+- View Medical Records
+- View Security Activity
+- Delete Patient (Admin only)
+
+Unauthorized users must NOT be able to view protected patient information.
+
+==================================================
+10. MEDICAL RECORDS
+==================================================
+
+Create a dedicated page:
+
+/medical-records
+
+Medical Records should focus on SECURE ACCESS.
+
+Add:
+
+"Secure Access" feature.
+
+When a doctor tries to access a patient record:
+
+STEP 1:
+Check login/session.
+
+STEP 2:
+Check user role.
+
+STEP 3:
+Check whether doctor is assigned/authorized for that patient.
+
+STEP 4:
+Calculate risk score.
+
+STEP 5:
+Check record sensitivity.
+
+STEP 6:
+Decision:
+
+LOW / AUTHORIZED:
+→ Show protected SYNTHETIC medical record.
+
+HIGH / CRITICAL / UNAUTHORIZED:
+→ Block protected record.
+→ Generate security event.
+→ Generate security alert when applicable.
+→ Redirect suspicious session to isolated decoy environment where appropriate.
+→ Log everything.
+
+Medical records may contain DEMO:
+- ECG report
+- Echo report
+- Blood test
+- Medical history
+- Demo prescription
+- Heart-related record information
+
+Clearly label:
+"SYNTHETIC DEMO MEDICAL DATA"
+
+==================================================
+11. PERMANENT DATA STORAGE
+==================================================
+
+This is VERY IMPORTANT.
+
+New Doctor and Patient records must be permanently persisted.
+
+Architecture:
+
+Frontend Form
+      ↓
+Flask API
+      ↓
+Validation
+      ↓
+Database
+      ↓
+Saved Record
+      ↓
+GET API
+      ↓
+Doctor/Patient List
+
+When page refreshes:
+→ Data remains.
+
+When user logs out and logs in:
+→ Data remains.
+
+When server restarts:
+→ Data remains if using persistent database storage.
+
+For Render deployment:
+Do NOT rely on temporary local filesystem storage for permanent database/profile photos.
+
+Use a persistent production database/storage solution appropriate for the project.
+
+If the existing project uses SQLite, keep it for local development, but prepare the application so production deployment can use persistent database storage.
+
+==================================================
+12. DATABASE REQUIREMENTS
+==================================================
+
+Use proper database tables/models such as:
+
+users
+doctors
+patients
+doctor_patient_assignments
+medical_records
+security_alerts
+risk_events
+audit_logs
+decoy_patients
+decoy_sessions
+break_glass_requests
+devices
+sessions
+
+Doctor and Patient records must have unique IDs.
+
+Relationships:
+Doctor
+   ↓
+Doctor-Patient Assignment
+   ↓
+Patient
+   ↓
+Medical Records
+
+==================================================
+13. NAVIGATION
+==================================================
+
+Main navigation:
+
+HOME
+DASHBOARD
+DOCTORS
+PATIENTS
+MEDICAL RECORDS
+SECURITY
+ABOUT
+PROFILE
+
+Under DASHBOARD/SECURITY:
+
+Advanced Healthcare Security
+Security Alerts
+Risk Analysis
+Threat Monitoring
+Decoy Environment
+Decoy Activity Monitor
+Audit Logs
+Device Security
+Emergency Break-Glass
+
+Do NOT put all these tools into one page.
+
+Each should open its own dedicated page.
+
+==================================================
+14. SECURITY REQUIREMENTS
+==================================================
+
+- Server-side authorization
+- RBAC
+- Patient-specific authorization
+- Password hashing
+- Session security
+- Input validation
+- Parameterized SQL
+- Secure API endpoints
+- File upload validation
+- Audit logging
+- Risk scoring
+- Security alerts
+- Protected/decoy data separation
+
+Never expose real patient data.
+
+This is an academic prototype using synthetic/demo data.
+
+==================================================
+15. FINAL UI STRUCTURE
+==================================================
+
+HOME
+ ├── CardioShield introduction
+ └── Doctors section
+
+DASHBOARD
+ ├── Overview
+ ├── Advanced Healthcare Security
+ ├── Security Alerts
+ ├── Risk Analysis
+ ├── Threat Monitoring
+ ├── Decoy Environment
+ ├── Decoy Activity Monitor
+ ├── Audit Logs
+ ├── Device Security
+ └── Emergency Break-Glass
+
+DOCTORS
+ ├── Doctor List
+ ├── Create New Doctor
+ └── Doctor Details
+
+PATIENTS
+ ├── Patient List
+ ├── Create New Patient
+ └── Patient Details
+
+MEDICAL RECORDS
+ └── Secure Access
+      ├── Authorization
+      ├── Risk Check
+      ├── Protected Synthetic Record
+      └── Decoy Flow for Suspicious Access
+
+==================================================
+FINAL REQUIREMENT
+==================================================
+
+Before finishing, test the complete flow:
+
+1. Create a new Doctor.
+2. Refresh the page.
+3. Confirm Doctor still exists.
+4. Logout/login.
+5. Confirm Doctor still exists.
+6. Create a new Patient.
+7. Refresh.
+8. Confirm Patient still exists.
+9. Assign Doctor to Patient.
+10. Open Medical Records.
+11. Test authorized access.
+12. Test unauthorized access.
+13. Confirm risk event is created.
+14. Confirm security alert is created when threshold is reached.
+15. Confirm audit log is created.
+16. Test decoy flow.
+17. Confirm protected data and decoy data remain separated.
+
+Do not just create UI screens.
+Make the pages connected to the existing backend and database and make the features functional.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-07T14:32:14+05:30.
+</ADDITIONAL_METADATA>

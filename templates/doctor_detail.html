@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}{{ doctor.name }} - Doctor Profile | CardioShield{% endblock %}
+
+{% block content %}
+<div class="content-header" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <span class="badge badge-low" style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;">
+                    {{ doctor.doctor_id }}
+                </span>
+                <span class="badge {% if doctor.status == 'active' %}badge-low{% else %}badge-critical{% endif %}" style="font-size: 0.72rem;">
+                    ● {{ doctor.status|upper }}
+                </span>
+            </div>
+            <h1 style="font-size: 1.85rem; font-weight: 900; color: var(--navy-primary); margin: 0;">
+                {{ doctor.name }}
+            </h1>
+            <p style="font-size: 0.9rem; color: var(--turquoise-primary); font-weight: 700; margin: 4px 0 0;">
+                {{ doctor.specialization or doctor.specialty }} &bull; {{ doctor.department }}
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a href="{{ url_for('cardioshield.doctor_list') }}" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left"></i> Doctor Roster
+            </a>
+            <a href="{{ url_for('cardioshield.doctor_edit', doctor_id=doctor.doctor_id) }}" class="btn btn-secondary btn-sm" style="font-weight: 700;">
+                <i class="fa-solid fa-pen-to-square"></i> Edit Doctor
+            </a>
+            {% if session.get('role') == 'admin' %}
+            <form method="POST" action="{{ url_for('cardioshield.doctor_delete', doctor_id=doctor.doctor_id) }}" onsubmit="return confirm('Are you sure you want to delete Doctor {{ doctor.name }}? This will permanently remove their credentials.');" style="display: inline;">
+                <button type="submit" class="btn btn-sm" style="background: #fee2e2; border-color: #fecaca; color: #b91c1c; font-weight: 700;">
+                    <i class="fa-solid fa-trash-can"></i> Delete Doctor
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="grid-3" style="gap: 24px; margin-bottom: 40px; align-items: flex-start;">
+    <!-- Left Column: Photo & Key Security Credentials -->
+    <div>
+        <div class="content-card" style="padding: 24px; text-align: center; margin-bottom: 24px;">
+            <!-- 1:1 Perfect Square Doctor Photo with Hospital Frame -->
+            <div style="width: 180px; height: 180px; margin: 0 auto 16px; border-radius: 12px; overflow: hidden; border: 2px solid #e2e8f0; background: #f8fafc; box-shadow: var(--shadow-sm);">
+                <img src="{{ doctor_photo(doctor.profile_photo) }}" alt="{{ doctor.name }}" style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1 / 1; display: block;">
+            </div>
+
+            <h3 style="font-size: 1.2rem; font-weight: 900; color: var(--navy-primary); margin-bottom: 4px;">{{ doctor.name }}</h3>
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--turquoise-primary); margin-bottom: 12px;">{{ doctor.specialization or doctor.specialty }}</div>
+
+            <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 16px;">
+                <span class="badge {% if doctor.permission_level == 'HIGHLY_CONFIDENTIAL' %}badge-high{% elif doctor.permission_level == 'CONFIDENTIAL' %}badge-medium{% else %}badge-low{% endif %}">
+                    Clearance: {{ doctor.permission_level }}
+                </span>
+            </div>
+
+            <div style="border-top: 1px solid var(--border-light); padding-top: 14px; text-align: left; font-size: 0.82rem; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Trusted Terminal:</span>
+                    <code style="font-size: 0.75rem;">{{ doctor.trusted_device_id or 'DEV-DOC01-TRUSTED' }}</code>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Terminal Status:</span>
+                    <span class="badge badge-low" style="font-size: 0.65rem;">
+                        <i class="fa-solid fa-shield-check"></i> TRUSTED BINDING
+                    </span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Last Login:</span>
+                    <span style="color: var(--navy-primary); font-weight: 600;">{{ doctor.last_login or 'Active Session' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="content-card" style="padding: 20px;">
+            <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--navy-primary); margin-bottom: 12px;">Quick Clinical Actions</h4>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <a href="#assigned-patients-section" class="btn btn-secondary btn-sm" style="justify-content: flex-start;">
+                    <i class="fa-solid fa-users-medical" style="color: var(--turquoise-primary);"></i> View Assigned Patients ({{ assigned_patients|length }})
+                </a>
+                <a href="#audit-activity-section" class="btn btn-secondary btn-sm" style="justify-content: flex-start;">
+                    <i class="fa-solid fa-file-shield" style="color: #0284c7;"></i> View Audit Activity
+                </a>
+                <a href="{{ url_for('cardioshield.medical_records_view') }}" class="btn btn-primary btn-sm" style="justify-content: flex-start;">
+                    <i class="fa-solid fa-notes-medical"></i> Open Medical Records Portal
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right 2 Columns: Full Professional Details & Assigned Patients & Activity -->
+    <div style="grid-column: span 2;">
+        <!-- Card 1: Professional Background -->
+        <div class="content-card" style="padding: 24px; margin-bottom: 24px;">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--navy-primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-user-doctor" style="color: var(--turquoise-primary);"></i> Professional Background
+            </h3>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 0.88rem;">
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-bottom: 2px;">Department</span>
+                    <strong style="color: var(--navy-primary);">{{ doctor.department }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-bottom: 2px;">Qualification</span>
+                    <strong style="color: var(--navy-primary);">{{ doctor.qualification or 'MBBS, MD Cardiology' }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-bottom: 2px;">Experience</span>
+                    <strong style="color: var(--navy-primary);">{% if 'Experience' in (doctor.experience or '') %}{{ doctor.experience }}{% else %}{{ doctor.experience or '8 Years' }} Experience{% endif %}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-bottom: 2px;">Specialty / Focus</span>
+                    <strong style="color: var(--navy-primary);">{{ doctor.specialization or doctor.specialty }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-bottom: 2px;">Contact Phone</span>
+                    <strong style="color: var(--navy-primary); font-family: var(--font-mono);">{{ mask_phone(doctor.demo_phone or '+15550192834') }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-bottom: 2px;">Email Address</span>
+                    <strong style="color: var(--navy-primary);">{{ doctor.email or doctor.user_email }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Assigned Patients Section -->
+        <div class="content-card" id="assigned-patients-section" style="padding: 24px; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border-light);">
+                <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--navy-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-heart-pulse" style="color: #ef4444;"></i> Assigned Heart Patients ({{ assigned_patients|length }})
+                </h3>
+                <a href="{{ url_for('cardioshield.patient_create') }}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+                    <i class="fa-solid fa-plus"></i> Add Patient
+                </a>
+            </div>
+
+            {% if assigned_patients %}
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for pat in assigned_patients %}
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 12px 16px;">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <img src="{{ patient_photo(pat.profile_photo) }}" alt="{{ pat.name }}" style="width: 44px; height: 44px; border-radius: 8px; object-fit: cover; aspect-ratio: 1/1; border: 1px solid #cbd5e1;">
+                        <div>
+                            <strong style="color: var(--navy-primary); font-size: 0.92rem; display: block;">{{ pat.name }}</strong>
+                            <span style="font-size: 0.78rem; color: var(--text-muted);">
+                                <code>{{ pat.patient_id }}</code> &bull; {{ pat.age }} yrs &bull; {{ pat.heart_condition_category }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="badge {% if pat.record_sensitivity_level == 'HIGHLY_CONFIDENTIAL' %}badge-high{% elif pat.record_sensitivity_level == 'CONFIDENTIAL' %}badge-medium{% else %}badge-low{% endif %}" style="font-size: 0.68rem;">
+                            {{ pat.record_sensitivity_level }}
+                        </span>
+                        <a href="{{ url_for('patients.patient_detail', patient_id=pat.patient_id) }}" class="btn btn-primary btn-sm" style="font-size: 0.75rem;">
+                            Open Chart &rarr;
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0; text-align: center; padding: 20px 0;">
+                No cardiac patients currently assigned to this doctor.
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Card 3: Recent Audit Activity -->
+        <div class="content-card" id="audit-activity-section" style="padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border-light);">
+                <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--navy-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-file-shield" style="color: #0284c7;"></i> Recent Security &amp; Clinical Audit Activity
+                </h3>
+                <a href="{{ url_for('cardioshield.audit_logs_view') }}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+                    Full Audit Logs &rarr;
+                </a>
+            </div>
+
+            {% if recent_activity %}
+            <div style="overflow-x: auto;">
+                <table class="table" style="margin-bottom: 0; font-size: 0.82rem;">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Patient</th>
+                            <th>Result</th>
+                            <th>Risk Score</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in recent_activity %}
+                        <tr>
+                            <td><strong>{{ log.action }}</strong></td>
+                            <td><code>{{ log.patient_id or '—' }}</code></td>
+                            <td>
+                                <span class="badge {% if log.result == 'SUCCESS' %}badge-low{% elif log.result == 'DENIED' %}badge-critical{% else %}badge-medium{% endif %}">
+                                    {{ log.result }}
+                                </span>
+                            </td>
+                            <td>{{ log.risk_score }}/100</td>
+                            <td style="color: var(--text-muted);">{{ log.timestamp }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0; text-align: center; padding: 16px 0;">
+                No recent activity recorded for this clinician.
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

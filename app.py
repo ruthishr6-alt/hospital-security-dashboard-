@@ -14,6 +14,7 @@ from routes.admin import admin_bp
 from routes.patients import patients_bp
 from routes.security import security_bp
 from routes.decoy import decoy_bp
+from routes.cardioshield import cardioshield_bp
 from models.user import UserModel
 from services.threat_detector import ThreatDetector
 from services.photo_service import PhotoService
@@ -33,6 +34,7 @@ def create_app():
     app.register_blueprint(patients_bp)
     app.register_blueprint(security_bp)
     app.register_blueprint(decoy_bp)
+    app.register_blueprint(cardioshield_bp)
 
     # Teardown database
     app.teardown_appcontext(close_db)

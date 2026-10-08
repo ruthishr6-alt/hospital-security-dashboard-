@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Roster - CardioShield Healthcare{% endblock %}
+
+{% block content %}
+<div class="content-header" style="margin-bottom: 28px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <span class="badge badge-info" style="font-size: 0.75rem; text-transform: uppercase;">
+                <i class="fa-solid fa-hospital-user"></i> Medical Staff Directory
+            </span>
+            <h1 style="font-size: 1.85rem; font-weight: 900; color: var(--navy-primary); margin: 6px 0 2px;">
+                Credentialed Cardiologists &amp; Specialists
+            </h1>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">
+                Qualified healthcare professionals managing critical cardiovascular patient records
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <a href="{{ url_for('cardioshield.doctor_create') }}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">
+                <i class="fa-solid fa-user-plus"></i> + Create New Doctor
+            </a>
+            <a href="{{ url_for('cardioshield.dashboard') }}" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-chart-line"></i> Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filter Strip -->
+<div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 18px 24px; margin-bottom: 28px; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <form method="GET" action="{{ url_for('cardioshield.doctor_list') }}" style="display: flex; gap: 10px; flex: 1; max-width: 500px;">
+        <div style="position: relative; flex: 1;">
+            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+            <input type="text" name="q" value="{{ query_str or '' }}" placeholder="Search by doctor name, specialty, or ID..." class="form-control" style="padding-left: 38px; margin-bottom: 0;">
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">
+            <i class="fa-solid fa-filter"></i> Search
+        </button>
+        {% if query_str %}
+        <a href="{{ url_for('cardioshield.doctor_list') }}" class="btn btn-secondary btn-sm" title="Clear filter">
+            <i class="fa-solid fa-xmark"></i> Clear
+        </a>
+        {% endif %}
+    </form>
+
+    <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
+        Showing <strong>{{ doctors|length }}</strong> Registered Clinicians
+    </div>
+</div>
+
+<!-- Doctors Grid: Responsive (4 per row desktop, 2 tablet, 1 mobile) -->
+<div class="qualified-doctors-grid" style="margin-bottom: 40px;">
+    {% for doc in doctors %}
+    <div class="qualified-doctor-card">
+        <!-- 1:1 Perfect Square Doctor Photo with Hospital Frame -->
+        <div class="doctor-square-frame">
+            <img src="{{ doctor_photo(doc.profile_photo) }}" alt="{{ doc.name }}" class="doctor-square-img">
+            <span class="doctor-active-pill">
+                {% if doc.status == 'active' %}● Active{% else %}● Inactive{% endif %}
+            </span>
+        </div>
+
+        <!-- Doctor Details Box -->
+        <div class="doctor-details-box">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                <h3 class="doctor-name" style="margin-bottom: 2px;">
+                    <a href="{{ url_for('cardioshield.doctor_detail', doctor_id=doc.doctor_id) }}" style="color: inherit; text-decoration: none;">
+                        {{ doc.name }}
+                    </a>
+                </h3>
+                <span class="badge badge-low" style="font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700;">
+                    {{ doc.doctor_id }}
+                </span>
+            </div>
+
+            <div class="doctor-specialization">{{ doc.specialization or doc.specialty }}</div>
+
+            <div class="doctor-meta-list">
+                <div class="doctor-meta-item">
+                    <span class="doctor-meta-label">Department:</span>
+                    <strong class="doctor-meta-value">{{ doc.department }}</strong>
+                </div>
+                <div class="doctor-meta-item">
+                    <span class="doctor-meta-label">Qualification:</span>
+                    <strong class="doctor-meta-value">{{ doc.qualification or 'MBBS, MD Cardiology' }}</strong>
+                </div>
+                <div class="doctor-meta-item">
+                    <span class="doctor-meta-label">Experience:</span>
+                    <strong class="doctor-meta-value">{% if 'Experience' in (doc.experience or '') %}{{ doc.experience }}{% else %}{{ doc.experience or '8 Years' }} Experience{% endif %}</strong>
+                </div>
+                <div class="doctor-meta-item">
+                    <span class="doctor-meta-label">Contact Phone:</span>
+                    <span class="doctor-meta-value" style="font-family: var(--font-mono); font-size: 0.78rem;">{{ mask_phone(doc.demo_phone or '+15550192834') }}</span>
+                </div>
+                <div class="doctor-meta-item">
+                    <span class="doctor-meta-label">Email:</span>
+                    <span class="doctor-meta-value" style="font-size: 0.78rem; word-break: break-all;">{{ doc.email or doc.user_email }}</span>
+                </div>
+                <div class="doctor-meta-item">
+                    <span class="doctor-meta-label">Account Status:</span>
+                    <span class="badge {% if doc.status == 'active' %}badge-low{% else %}badge-critical{% endif %}" style="font-size: 0.65rem;">
+                        {{ doc.status|upper }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="doctor-card-action" style="display: flex; gap: 8px;">
+                <a href="{{ url_for('cardioshield.doctor_detail', doctor_id=doc.doctor_id) }}" class="btn btn-secondary btn-sm" style="flex: 1; justify-content: center; font-size: 0.78rem;">
+                    <i class="fa-solid fa-address-card"></i> View Profile
+                </a>
+                <a href="{{ url_for('cardioshield.doctor_edit', doctor_id=doc.doctor_id) }}" class="btn btn-secondary btn-sm" style="padding: 6px 10px;" title="Edit Doctor Profile">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div style="grid-column: 1 / -1; background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 48px; text-align: center;">
+        <i class="fa-solid fa-user-doctor" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 12px;"></i>
+        <h3 style="color: var(--navy-primary); font-size: 1.15rem; margin-bottom: 6px;">No Clinicians Found</h3>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 18px;">No doctor records matched your search query.</p>
+        <a href="{{ url_for('cardioshield.doctor_create') }}" class="btn btn-primary btn-sm">
+            <i class="fa-solid fa-plus"></i> Create New Doctor
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

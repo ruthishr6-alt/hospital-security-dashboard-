@@ -145,3 +145,54 @@ class UserModel:
     @staticmethod
     def get_all_devices():
         return query_db("SELECT * FROM device_status ORDER BY device_status ASC, device_id ASC")
+
+    @staticmethod
+    def create_doctor(doctor_id, name, specialization, qualification, experience,
+                      department, demo_phone, email, permission_level='NORMAL',
+                      status='active', profile_photo=None, username=None, password_hash=None, user_id=None):
+        import uuid
+        if not user_id:
+            user_uid = f"USR-{uuid.uuid4().hex[:8].upper()}"
+        else:
+            user_uid = user_id
+        if not username:
+            username = f"doc_{doctor_id.lower()}"
+        if not password_hash:
+            from werkzeug.security import generate_password_hash
+            password_hash = generate_password_hash('DoctorDemo#2026!')
+
+        execute_db('''
+            INSERT INTO users (user_id, username, password_hash, role, name, email, status)
+            VALUES (?, ?, ?, 'doctor', ?, ?, ?)
+        ''', (user_uid, username, password_hash, name, email, status))
+
+        execute_db('''
+            INSERT INTO doctors (
+                doctor_id, user_id, name, profile_photo, specialty, specialization,
+                qualification, experience, department, email, demo_phone,
+                permission_level, status
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            doctor_id, user_uid, name, profile_photo, specialization, specialization,
+            qualification, experience, department, email, demo_phone,
+            permission_level, status
+        ))
+
+        device_id = f"DEV-{doctor_id}-STATION"
+        execute_db('''
+            INSERT OR IGNORE INTO device_status (device_id, user_id, device_name, device_status, risk_contribution)
+            VALUES (?, ?, ?, 'TRUSTED', -5)
+        ''', (device_id, user_uid, f"Clinician Station - {name}"))
+
+        return doctor_id
+
+    @staticmethod
+    def delete_doctor(doctor_id):
+        doc = query_db("SELECT user_id, name FROM doctors WHERE doctor_id = ?", (doctor_id,), one=True)
+        if doc:
+            execute_db("DELETE FROM doctor_patient_assignments WHERE doctor_id = ?", (doctor_id,))
+            execute_db("DELETE FROM doctors WHERE doctor_id = ?", (doctor_id,))
+            execute_db("DELETE FROM users WHERE user_id = ?", (doc['user_id'],))
+            return doc
+        return None
+

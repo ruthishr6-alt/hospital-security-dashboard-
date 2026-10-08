@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Patient Profile - CardioShield{% endblock %}
+
+{% block content %}
+<div class="content-header" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div>
+            <span class="badge badge-info" style="font-size: 0.75rem; text-transform: uppercase;">
+                <i class="fa-solid fa-heart-pulse"></i> Patient Admission
+            </span>
+            <h1 style="font-size: 1.85rem; font-weight: 900; color: var(--navy-primary); margin: 6px 0 2px;">
+                Create New Patient Profile
+            </h1>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">
+                Register a synthetic critical heart patient into the Zero-Trust clinical registry
+            </p>
+        </div>
+
+        <a href="{{ url_for('patients.patient_list') }}" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-arrow-left"></i> Back to Patient Directory
+        </a>
+    </div>
+</div>
+
+<div style="max-width: 860px; margin: 0 auto 50px;">
+    <form method="POST" action="{{ url_for('cardioshield.patient_create') }}" enctype="multipart/form-data" class="content-card" style="padding: 32px;" id="patientCreateForm">
+        <!-- Photo Upload Box (1:1 Square) -->
+        <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 28px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+            <div style="width: 130px; height: 130px; border-radius: 10px; overflow: hidden; border: 2px solid #cbd5e1; background: #fee2e2; flex-shrink: 0; box-shadow: var(--shadow-sm); position: relative;">
+                <img id="photoPreview" src="{{ patient_photo(None) }}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1 / 1; display: block;">
+            </div>
+
+            <div style="flex: 1; min-width: 260px;">
+                <label class="form-label" style="font-weight: 800; color: var(--navy-primary); margin-bottom: 4px;">
+                    <i class="fa-solid fa-camera" style="color: var(--turquoise-primary);"></i> Patient Photo (1:1 Square)
+                </label>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 12px;">
+                    Allowed: <strong>JPG, JPEG, PNG, WEBP</strong> (Max size: 5 MB). Displayed in 1:1 square format.
+                </p>
+
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <label for="profilePhotoInput" class="btn btn-primary btn-sm" style="cursor: pointer; margin-bottom: 0;">
+                        <i class="fa-solid fa-upload"></i> Upload Photo
+                    </label>
+                    <input type="file" id="profilePhotoInput" name="profile_photo" accept=".jpg,.jpeg,.png,.webp" style="display: none;" onchange="handlePhotoSelect(this)">
+                    
+                    <button type="button" class="btn btn-secondary btn-sm" id="removePhotoBtn" onclick="resetPhotoPreview()" style="display: none;">
+                        <i class="fa-solid fa-trash-can"></i> Remove Photo
+                    </button>
+                    <span id="fileNameLabel" style="font-size: 0.8rem; color: var(--text-muted);">No file selected</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Demographics -->
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--navy-primary); margin-bottom: 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-id-card" style="color: var(--turquoise-primary);"></i> Patient Demographics
+        </h3>
+
+        <div class="grid-2" style="gap: 18px; margin-bottom: 18px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="patName">Full Name *</label>
+                <input type="text" id="patName" name="name" class="form-control" placeholder="e.g. Robert Caldwell" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="patId">
+                    Patient ID <span style="font-size: 0.76rem; color: var(--text-muted); font-weight: normal;">(Auto-generated if blank)</span>
+                </label>
+                <input type="text" id="patId" name="patient_id" class="form-control" placeholder="e.g. {{ generated_id }}" value="{{ generated_id }}">
+            </div>
+        </div>
+
+        <div class="grid-3" style="gap: 18px; margin-bottom: 18px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="patAge">Age *</label>
+                <input type="number" id="patAge" name="age" class="form-control" min="1" max="120" value="56" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="patGender">Gender *</label>
+                <select id="patGender" name="gender" class="form-control">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="patBlood">Blood Group *</label>
+                <select id="patBlood" name="blood_group" class="form-control">
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Section 2: Clinical Cardiology & Assignment -->
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--navy-primary); margin: 28px 0 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-stethoscope" style="color: var(--turquoise-primary);"></i> Cardiology &amp; Physician Assignment
+        </h3>
+
+        <div class="grid-2" style="gap: 18px; margin-bottom: 18px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="heartCond">Heart Condition Category *</label>
+                <input type="text" id="heartCond" name="heart_condition_category" class="form-control" placeholder="e.g. Acute Coronary Syndrome or Heart Failure" value="Coronary Artery Disease (CAD)" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="assignedDoctor">Assigned Cardiologist *</label>
+                <select id="assignedDoctor" name="assigned_doctor_id" class="form-control">
+                    {% for doc in doctors %}
+                    <option value="{{ doc.doctor_id }}">{{ doc.name }} ({{ doc.doctor_id }} - {{ doc.department }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 18px;">
+            <label class="form-label" for="medHistory">Synthetic Medical History</label>
+            <textarea id="medHistory" name="medical_history" class="form-control" rows="3" placeholder="Enter synthetic cardiovascular clinical history...">Synthetic: History of hypertension (8 yrs), dyslipidemia, prior PCI with drug-eluting stent. No drug allergies.</textarea>
+        </div>
+
+        <!-- Section 3: Contact & Emergency -->
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--navy-primary); margin: 28px 0 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-phone" style="color: var(--turquoise-primary);"></i> Contact &amp; Emergency Next-of-Kin
+        </h3>
+
+        <div class="grid-2" style="gap: 18px; margin-bottom: 18px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="patEmergency">Emergency Contact *</label>
+                <input type="text" id="patEmergency" name="emergency_contact" class="form-control" placeholder="e.g. Evelyn Caldwell (Spouse) - 555-0199" value="Evelyn Caldwell (Spouse) - 555-0199" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="patPhone">Patient Phone Number</label>
+                <div style="display: flex; gap: 8px;">
+                    <select name="country_code" class="form-control" style="width: 140px;">
+                        {% for c in country_codes %}
+                        <option value="{{ c.code }}" {% if c.code == '+1' %}selected{% endif %}>{{ c.flag }} {{ c.code }} ({{ c.country }})</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" id="patPhone" name="phone_number" class="form-control" placeholder="(555) 019-2045" value="(555) 019-2045" style="flex: 1;">
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2" style="gap: 18px; margin-bottom: 24px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="patEmail">Email Address</label>
+                <input type="email" id="patEmail" name="email" class="form-control" placeholder="e.g. patient@synthetic-cardio.internal">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="recSens">Record Sensitivity Tier</label>
+                <select id="recSens" name="record_sensitivity" class="form-control">
+                    <option value="NORMAL" selected>NORMAL (Standard Attending Access)</option>
+                    <option value="CONFIDENTIAL">CONFIDENTIAL (Elevated Clinical Clearance)</option>
+                    <option value="HIGHLY_CONFIDENTIAL">HIGHLY_CONFIDENTIAL (Highest Vault Clearance)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 28px;">
+            <label class="form-label" for="accessStat">Access Status</label>
+            <select id="accessStat" name="access_status" class="form-control">
+                <option value="active" selected>Active Inpatient</option>
+                <option value="disabled">Discharged / Inactive</option>
+            </select>
+        </div>
+
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #2563eb; padding: 14px 18px; border-radius: 8px; margin-bottom: 24px;">
+            <strong style="color: #1e40af; font-size: 0.84rem; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-database"></i> Permanent Database Persistence Notice
+            </strong>
+            <p style="font-size: 0.8rem; color: #475569; margin: 4px 0 0;">
+                This patient profile will be stored permanently in the database. It will immediately appear in the Patient Directory, link to the assigned cardiologist, and remain available across page refreshes, logouts, and server restarts.
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <a href="{{ url_for('patients.patient_list') }}" class="btn btn-secondary">
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-primary btn-lg" style="min-width: 180px;">
+                <i class="fa-solid fa-floppy-disk"></i> Save Patient Profile
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+const defaultPatientAvatar = "{{ patient_photo(None) }}";
+
+function handlePhotoSelect(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        if (file.size > 5 * 1024 * 1024) {
+            alert("File size exceeds 5MB limit.");
+            input.value = "";
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('photoPreview').src = e.target.result;
+            document.getElementById('removePhotoBtn').style.display = 'inline-flex';
+            document.getElementById('fileNameLabel').textContent = file.name;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function resetPhotoPreview() {
+    document.getElementById('profilePhotoInput').value = "";
+    document.getElementById('photoPreview').src = defaultPatientAvatar;
+    document.getElementById('removePhotoBtn').style.display = 'none';
+    document.getElementById('fileNameLabel').textContent = "No file selected";
+}
+</script>
+{% endblock %}

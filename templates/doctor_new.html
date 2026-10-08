@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Doctor Profile - CardioShield{% endblock %}
+
+{% block content %}
+<div class="content-header" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div>
+            <span class="badge badge-info" style="font-size: 0.75rem; text-transform: uppercase;">
+                <i class="fa-solid fa-user-plus"></i> Staff Registration
+            </span>
+            <h1 style="font-size: 1.85rem; font-weight: 900; color: var(--navy-primary); margin: 6px 0 2px;">
+                Create New Doctor Profile
+            </h1>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">
+                Register a credentialed cardiologist or specialist into CardioShield's secure database
+            </p>
+        </div>
+
+        <a href="{{ url_for('cardioshield.doctor_list') }}" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-arrow-left"></i> Back to Doctor Roster
+        </a>
+    </div>
+</div>
+
+<div style="max-width: 860px; margin: 0 auto 50px;">
+    <form method="POST" action="{{ url_for('cardioshield.doctor_create') }}" enctype="multipart/form-data" class="content-card" style="padding: 32px;" id="doctorCreateForm">
+        <!-- Photo Upload Preview Box (1:1 Perfect Square) -->
+        <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 28px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+            <div style="width: 130px; height: 130px; border-radius: 10px; overflow: hidden; border: 2px solid #cbd5e1; background: #ffffff; flex-shrink: 0; box-shadow: var(--shadow-sm); position: relative;">
+                <img id="photoPreview" src="{{ doctor_photo(None) }}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1 / 1; display: block;">
+            </div>
+
+            <div style="flex: 1; min-width: 260px;">
+                <label class="form-label" style="font-weight: 800; color: var(--navy-primary); margin-bottom: 4px;">
+                    <i class="fa-solid fa-camera" style="color: var(--turquoise-primary);"></i> Profile Photo (1:1 Square)
+                </label>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 12px;">
+                    Allowed formats: <strong>JPG, JPEG, PNG, WEBP</strong> (Max size: 5 MB). Displayed in perfect square format.
+                </p>
+
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <label for="profilePhotoInput" class="btn btn-primary btn-sm" style="cursor: pointer; margin-bottom: 0;">
+                        <i class="fa-solid fa-upload"></i> Upload Photo
+                    </label>
+                    <input type="file" id="profilePhotoInput" name="profile_photo" accept=".jpg,.jpeg,.png,.webp" style="display: none;" onchange="handlePhotoSelect(this)">
+                    
+                    <button type="button" class="btn btn-secondary btn-sm" id="removePhotoBtn" onclick="resetPhotoPreview()" style="display: none;">
+                        <i class="fa-solid fa-trash-can"></i> Remove Photo
+                    </button>
+                    <span id="fileNameLabel" style="font-size: 0.8rem; color: var(--text-muted);">No file selected</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Demographics & Clinical Identity -->
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--navy-primary); margin-bottom: 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-id-card-clip" style="color: var(--turquoise-primary);"></i> Clinician Details
+        </h3>
+
+        <div class="grid-2" style="gap: 18px; margin-bottom: 18px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="docName">Full Name *</label>
+                <input type="text" id="docName" name="name" class="form-control" placeholder="e.g. Dr. Arun Kumar, MD" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="docId">
+                    Doctor ID <span style="font-size: 0.76rem; color: var(--text-muted); font-weight: normal;">(Auto-generated if blank)</span>
+                </label>
+                <input type="text" id="docId" name="doctor_id" class="form-control" placeholder="e.g. {{ generated_id }}" value="{{ generated_id }}">
+            </div>
+        </div>
+
+        <div class="grid-2" style="gap: 18px; margin-bottom: 18px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="docSpec">Specialization *</label>
+                <input type="text" id="docSpec" name="specialization" class="form-control" placeholder="e.g. Cardiologist or Interventional Cardiology" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="docDept">Department *</label>
+                <input type="text" id="docDept" name="department" class="form-control" placeholder="e.g. Cardiology Department" value="Cardiology Department" required>
+            </div>
+        </div>
+
+        <div class="grid-2" style="gap: 18px; margin-bottom: 18px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="docQual">Qualification</label>
+                <input type="text" id="docQual" name="qualification" class="form-control" placeholder="e.g. MBBS, MD Cardiology" value="MBBS, MD">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="docExp">Experience</label>
+                <input type="text" id="docExp" name="experience" class="form-control" placeholder="e.g. 8 Years" value="8 Years">
+            </div>
+        </div>
+
+        <!-- Section 2: Contact Information -->
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--navy-primary); margin: 28px 0 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-address-book" style="color: var(--turquoise-primary);"></i> Contact &amp; Communication
+        </h3>
+
+        <div class="grid-2" style="gap: 18px; margin-bottom: 18px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="docEmail">Email Address</label>
+                <input type="email" id="docEmail" name="email" class="form-control" placeholder="e.g. arun.kumar@cardioshield.org">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="docPhone">Phone Number</label>
+                <div style="display: flex; gap: 8px;">
+                    <select name="country_code" class="form-control" style="width: 140px;">
+                        {% for c in country_codes %}
+                        <option value="{{ c.code }}" {% if c.code == '+1' %}selected{% endif %}>{{ c.flag }} {{ c.code }} ({{ c.country }})</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" id="docPhone" name="phone_number" class="form-control" placeholder="(555) 019-2834" value="(555) 019-2834" style="flex: 1;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Access Control & Security -->
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--navy-primary); margin: 28px 0 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-shield-halved" style="color: var(--turquoise-primary);"></i> Clearance &amp; System Status
+        </h3>
+
+        <div class="grid-2" style="gap: 18px; margin-bottom: 28px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="permLevel">Permission Level</label>
+                <select id="permLevel" name="permission_level" class="form-control">
+                    <option value="NORMAL">NORMAL (Standard Cardiac Records)</option>
+                    <option value="CONFIDENTIAL">CONFIDENTIAL (Telemetry &amp; Waveforms)</option>
+                    <option value="HIGHLY_CONFIDENTIAL">HIGHLY_CONFIDENTIAL (Transplant &amp; Cath Lab)</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="acctStatus">Account Status</label>
+                <select id="acctStatus" name="account_status" class="form-control">
+                    <option value="active" selected>Active</option>
+                    <option value="disabled">Disabled</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="background: #f0fdfa; border: 1px solid #b2ebf2; border-left: 4px solid var(--turquoise-primary); padding: 14px 18px; border-radius: 8px; margin-bottom: 24px;">
+            <strong style="color: #007799; font-size: 0.84rem; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-database"></i> Permanent Database Persistence Notice
+            </strong>
+            <p style="font-size: 0.8rem; color: #475569; margin: 4px 0 0;">
+                This doctor record will be stored permanently in the backend database. It will immediately appear in the Doctor roster, support patient assignments, and persist across refreshes, logins, and server restarts.
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <a href="{{ url_for('cardioshield.doctor_list') }}" class="btn btn-secondary">
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-primary btn-lg" style="min-width: 180px;">
+                <i class="fa-solid fa-floppy-disk"></i> Save Doctor Profile
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+const defaultAvatar = "{{ doctor_photo(None) }}";
+
+function handlePhotoSelect(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // Validate size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert("File size exceeds 5MB limit. Please choose a smaller image.");
+            input.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('photoPreview').src = e.target.result;
+            document.getElementById('removePhotoBtn').style.display = 'inline-flex';
+            document.getElementById('fileNameLabel').textContent = file.name;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function resetPhotoPreview() {
+    document.getElementById('profilePhotoInput').value = "";
+    document.getElementById('photoPreview').src = defaultAvatar;
+    document.getElementById('removePhotoBtn').style.display = 'none';
+    document.getElementById('fileNameLabel').textContent = "No file selected";
+}
+</script>
+{% endblock %}
